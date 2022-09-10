@@ -7,7 +7,7 @@ export default function Auth() {
   const [email, setEmail] = useState("");
 
   const handleLogin = async (e: any) => {
-    e.preventDefault();
+    e?.preventDefault();
 
     try {
       setLoading(true);

@@ -1,12 +1,13 @@
 import { AuthError, Session } from "@supabase/supabase-js";
 import { useState, useEffect } from "react";
 import { supabase } from "../api/supabaseClient";
+import Avatar from "../components/Avatar";
 
 function Account(props: { session: Session }) {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState(null);
   const [displayname, setDisplayName] = useState(null);
-  const [avatar_url, setAvatarUrl] = useState(null);
+  const [avatar_url, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const getProfile = async () => {
@@ -43,7 +44,7 @@ function Account(props: { session: Session }) {
   }, [props.session]);
 
   const updateProfile = async (e: any) => {
-    e.preventDefault();
+    e?.preventDefault();
 
     try {
       setLoading(true);
@@ -82,6 +83,15 @@ function Account(props: { session: Session }) {
         "Saving ..."
       ) : (
         <form onSubmit={updateProfile} className="flex flex-col gap-3">
+          <Avatar
+            url={avatar_url ?? ""}
+            size={150}
+            onUpload={async (url) => {
+              console.log("url", url);
+              setAvatarUrl(url);
+              //   await updateProfile(null);
+            }}
+          />
           <div className="">Email: {props.session.user.email} </div>
           <div className=" flex items-center">
             <label className="min-w-[100px]" htmlFor="username">
@@ -95,7 +105,7 @@ function Account(props: { session: Session }) {
               onChange={(e: any) => setUsername(e.target.value)}
             />
           </div>
-          <div className=" flex items-center">
+          <div className="flex items-center">
             <label className="min-w-[100px]" htmlFor="displayname">
               DisplayName
             </label>
@@ -109,8 +119,8 @@ function Account(props: { session: Session }) {
           </div>
           <div className=" flex">
             <button
-              className="btn btn-primary"
-              type="button"
+              className={`btn btn-primary ${loading && "loading"}`}
+              type="submit"
               disabled={loading}
             >
               Update profile
