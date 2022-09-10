@@ -1,9 +1,12 @@
-import { AuthError, Session } from "@supabase/supabase-js";
+import { AuthError } from "@supabase/supabase-js";
 import { useState, useEffect } from "react";
-import { supabase } from "../api/supabaseClient";
-import Avatar from "../components/Avatar";
 
-function Account(props: { session: Session }) {
+import Avatar from "../components/Avatar";
+import { useAppContext } from "../context/appContext";
+
+function Account() {
+  const { currentSession, supabase, auth } = useAppContext();
+
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState(null);
   const [displayname, setDisplayName] = useState(null);
@@ -13,7 +16,7 @@ function Account(props: { session: Session }) {
     const getProfile = async () => {
       try {
         setLoading(true);
-        const { user } = props.session;
+        const { user } = currentSession!;
 
         let { data, error, status } = await supabase
           .from("profiles")
@@ -41,14 +44,14 @@ function Account(props: { session: Session }) {
       }
     };
     getProfile();
-  }, [props.session]);
+  }, [currentSession, supabase]);
 
   const updateProfile = async (e: any) => {
     e?.preventDefault();
 
     try {
       setLoading(true);
-      const { user } = props.session;
+      const { user } = currentSession!;
 
       const updates = {
         id: user.id,
@@ -76,12 +79,10 @@ function Account(props: { session: Session }) {
 
   return (
     <div
-      className="mx-auto p-6 bg-base-100 border border-base-200 prose rounded-lg m-4"
+      className="p-6 m-4 mx-auto prose border rounded-lg bg-base-100 border-base-200"
       aria-live="polite"
     >
-      {loading ? (
-        "Saving ..."
-      ) : (
+      {
         <form onSubmit={updateProfile} className="flex flex-col gap-3">
           <Avatar
             url={avatar_url ?? ""}
@@ -92,8 +93,8 @@ function Account(props: { session: Session }) {
               //   await updateProfile(null);
             }}
           />
-          <div className="">Email: {props.session.user.email} </div>
-          <div className=" flex items-center">
+          <div className="">Email: {currentSession?.user.email} </div>
+          <div className="flex items-center ">
             <label className="min-w-[100px]" htmlFor="username">
               UserName
             </label>
@@ -117,7 +118,7 @@ function Account(props: { session: Session }) {
               onChange={(e: any) => setDisplayName(e.target.value)}
             />
           </div>
-          <div className=" flex">
+          <div className="flex ">
             <button
               className={`btn btn-primary ${loading && "loading"}`}
               type="submit"
@@ -127,11 +128,11 @@ function Account(props: { session: Session }) {
             </button>
           </div>
         </form>
-      )}
+      }
       <button
         type="button"
-        className="btn btn-outline mt-4"
-        onClick={() => supabase.auth.signOut()}
+        className="mt-4 btn btn-outline"
+        onClick={() => auth.signOut()}
       >
         Sign Out
       </button>

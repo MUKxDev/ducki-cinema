@@ -1,39 +1,41 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../api/supabaseClient";
 import uploadSvg from "../assets/upload.svg";
+import { useAppContext } from "../context/appContext";
 
 export default function Avatar(props: {
   url: string;
   size: string | number;
   onUpload: (path: string) => void;
 }) {
+  const { supabase } = useAppContext();
+
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
+    const downloadImage = async (path: string) => {
+      try {
+        const { data, error } = await supabase.storage
+          .from("avatars")
+          .download(path);
+        if (error) {
+          throw error;
+        }
+        const url = URL.createObjectURL(data);
+        setAvatarUrl(url);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.log("Error downloading image: ", error.message);
+        }
+      }
+    };
+
     if (props.url) downloadImage(props.url);
-  }, [props.url]);
+  }, [props.url, supabase]);
 
   function clickUpload() {
     document.getElementById("single")?.click();
   }
-
-  const downloadImage = async (path: string) => {
-    try {
-      const { data, error } = await supabase.storage
-        .from("avatars")
-        .download(path);
-      if (error) {
-        throw error;
-      }
-      const url = URL.createObjectURL(data);
-      setAvatarUrl(url);
-    } catch (error) {
-      if (error instanceof Error) {
-        console.log("Error downloading image: ", error.message);
-      }
-    }
-  };
 
   const uploadAvatar = async (event: any) => {
     try {
@@ -71,7 +73,7 @@ export default function Avatar(props: {
       className={`flex flex-col max-w-fit not-prose items-center`}
       aria-live="polite"
     >
-      <div className="avatar w-36 aspect-square rounded-lg overflow-clip">
+      <div className="rounded-lg avatar w-36 aspect-square overflow-clip">
         <img
           src={
             avatarUrl

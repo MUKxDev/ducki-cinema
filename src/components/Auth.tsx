@@ -1,8 +1,10 @@
 import { AuthError } from "@supabase/supabase-js";
 import { useState } from "react";
-import { supabase } from "../api/supabaseClient";
+import { useAppContext } from "../context/appContext";
 
 export default function Auth() {
+  const { auth } = useAppContext();
+
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
 
@@ -11,7 +13,7 @@ export default function Auth() {
 
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signInWithOtp({ email });
+      const { error } = await auth.signInWithOtp({ email });
       if (error) throw error;
       alert("Check your email for the login link!");
     } catch (error) {
@@ -26,8 +28,8 @@ export default function Auth() {
   };
 
   return (
-    <div className="hero min-h-screen bg-base-200">
-      <div className="hero-content flex-col lg:flex-row-reverse">
+    <div className="min-h-screen hero bg-base-200">
+      <div className="flex-col hero-content lg:flex-row-reverse">
         <div className="text-center lg:text-left">
           <h1 className="text-5xl font-bold">Login now!</h1>
           <p className="py-6">
@@ -35,7 +37,7 @@ export default function Auth() {
             togather!
           </p>
         </div>
-        <div className="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+        <div className="flex-shrink-0 w-full max-w-sm shadow-2xl card bg-base-100">
           <form onSubmit={handleLogin} className="card-body">
             <div className="form-control">
               <label className="label">
@@ -50,7 +52,7 @@ export default function Auth() {
               />
             </div>
 
-            <div className="form-control mt-6">
+            <div className="mt-6 form-control">
               <button
                 type="submit"
                 aria-live="polite"
@@ -63,41 +65,5 @@ export default function Auth() {
         </div>
       </div>
     </div>
-    // <div className="prose mx-auto prose-blue prose-h1:text-primary my-6">
-    //   <div
-    //     className="bg-base-100 border border-base-200 rounded-2xl p-4 "
-    //     aria-live="polite"
-    //   >
-    //     <h1 className="">Ducki Cinema</h1>
-    //     <h4 className="description">
-    //       Sign in via magic link with your email below
-    //     </h4>
-    //     {loading ? (
-    //       "Sending magic link..."
-    //     ) : (
-    //       <form
-    //         className="flex justify-between items-center"
-    //         onSubmit={handleLogin}
-    //       >
-    //         <label htmlFor="email">Email</label>
-    //         <input
-    //           id="email"
-    //           className="input input-bordered"
-    //           type="email"
-    //           placeholder="Your email"
-    //           value={email}
-    //           onChange={(e) => setEmail(e.target.value)}
-    //         />
-    //         <button
-    //           className="btn btn-primary"
-    //           aria-live="polite"
-    //           type="button"
-    //         >
-    //           Send magic link
-    //         </button>
-    //       </form>
-    //     )}
-    //   </div>
-    // </div>
   );
 }

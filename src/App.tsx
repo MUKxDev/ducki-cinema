@@ -1,33 +1,23 @@
-import { Session } from "@supabase/supabase-js";
-import { useState, useEffect } from "react";
-import { supabase } from "./api/supabaseClient";
 import "./App.css";
+import { AppContextProvider, useAppContext } from "./context/appContext";
 import Auth from "./components/Auth";
 import Account from "./pages/Account";
 
 function App() {
-  const [session, setSession] = useState<Session | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
+  const { currentSession } = useAppContext();
 
   return (
-    <div className="App">
-      <div className="">
-        {!session ? (
-          <Auth />
-        ) : (
-          <Account key={session.user.id} session={session} />
-        )}
+    <AppContextProvider>
+      <div className="App">
+        <div className="">
+          {!currentSession ? (
+            <Auth />
+          ) : (
+            <Account key={currentSession.user.id} />
+          )}
+        </div>
       </div>
-    </div>
+    </AppContextProvider>
   );
 }
 
