@@ -1,12 +1,13 @@
 import { MutableRefObject, useEffect, useRef, useState } from "react";
-import FilePlayer from "react-player/file";
+import ReactPlayer from "react-player";
+// import FilePlayer from "react-player/file";
 
 interface Props {
   url: string;
 }
 
 export default function DuckiPlayer({ url }: Props) {
-  const playerRef: MutableRefObject<FilePlayer | null> = useRef(null);
+  const playerRef: MutableRefObject<ReactPlayer | null> = useRef(null);
   const [seek, setSeek] = useState(0);
   const [playing, setPlaying] = useState(false);
 
@@ -33,16 +34,20 @@ export default function DuckiPlayer({ url }: Props) {
   }
 
   return (
-    <div className="prose prose-slate container mx-auto p-6">
-      <div className="flex flex-col justify-start items-start">
+    <div className="container p-6 mx-auto prose prose-slate">
+      <div className="flex flex-col items-start justify-start">
         <h1>DuckiPlayer</h1>
+        {/* <iframe
+          src="https://vidstream.pro/e/X1P2Z7KKOJ62?sub.info=https%3A%2F%2Ffmovies.to%2Fajax%2Fepisode%2Fsubtitles%2Fafcb80dfbeb8a2c78a514f34ccefbe05%3F"
+          title="s"
+        ></iframe> */}
         <p>
           This player is made to help you watch movies with your loved ones.
         </p>
       </div>
-      <div className="w-full p-3 rounded-2xl bg-slate-100 border border-slate-300">
+      <div className="w-full p-3 border rounded-2xl bg-slate-100 border-slate-300">
         <div className="w-full not-prose rounded-xl overflow-clip">
-          <FilePlayer
+          <ReactPlayer
             playing={playing}
             ref={playerRef}
             width={"100%"}
@@ -51,24 +56,22 @@ export default function DuckiPlayer({ url }: Props) {
             onPlay={play}
             onPause={pause}
             url={url}
-            config={{
-              forceHLS: true,
-            }}
             controls
+            playsinline
           />
         </div>
       </div>
 
-      <div className="flex justify-center items-center not-prose">
-        <h3 className="p-2 bg-slate-300 rounded-md ">currnet seek is {seek}</h3>
+      <div className="flex items-center justify-center not-prose">
+        <h3 className="p-2 rounded-md bg-slate-300 ">currnet seek is {seek}</h3>
         <div
-          className="px-4 m-4 select-none py-2 bg-slate-800 text-white font-semibold hover:cursor-pointer rounded-lg"
+          className="px-4 py-2 m-4 font-semibold text-white rounded-lg select-none bg-slate-800 hover:cursor-pointer"
           onClick={seek50}
         >
           Seek to 50
         </div>
         <div
-          className="px-4 m-4 select-none py-2 bg-slate-800 text-white font-semibold hover:cursor-pointer rounded-lg"
+          className="px-4 py-2 m-4 font-semibold text-white rounded-lg select-none bg-slate-800 hover:cursor-pointer"
           onClick={playing ? pause : play}
         >
           {playing ? "pause" : "play"}
