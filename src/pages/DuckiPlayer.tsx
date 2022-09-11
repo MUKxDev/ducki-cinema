@@ -1,7 +1,11 @@
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import FilePlayer from "react-player/file";
 
-export default function DuckiPlayer() {
+interface Props {
+  url: string;
+}
+
+export default function DuckiPlayer({ url }: Props) {
   const playerRef: MutableRefObject<FilePlayer | null> = useRef(null);
   const [seek, setSeek] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -46,9 +50,10 @@ export default function DuckiPlayer() {
             onSeek={onSeek}
             onPlay={play}
             onPause={pause}
-            url={
-              "https://zloj.vizcloud.ink/simple/EqPFIfsQWADtjDlGha7rC8Eu+Vxa5uTpSkB7rqk+wYMnU94US2El/br/list.m3u8"
-            }
+            url={url}
+            config={{
+              forceHLS: true,
+            }}
             controls
           />
         </div>

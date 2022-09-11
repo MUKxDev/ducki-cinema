@@ -1,21 +1,13 @@
 import "./App.css";
-import { AppContextProvider, useAppContext } from "./context/appContext";
-import Auth from "./components/Auth";
-import Account from "./pages/Account";
+import { AppContextProvider } from "./context/appContext";
+
+import StartUp from "./pages/StartUp";
 
 function App() {
-  const { currentSession } = useAppContext();
-
   return (
     <AppContextProvider>
       <div className="App">
-        <div className="">
-          {!currentSession ? (
-            <Auth />
-          ) : (
-            <Account key={currentSession.user.id} />
-          )}
-        </div>
+        <StartUp></StartUp>
       </div>
     </AppContextProvider>
   );

@@ -8,6 +8,11 @@ import {
 import { createClient, Session, SupabaseClient } from "@supabase/supabase-js";
 import { SupabaseAuthClient } from "@supabase/supabase-js/dist/module/lib/SupabaseAuthClient";
 
+/* Creating a new instance of the Supabase client. */
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
+
 interface IAppContext {
   supabase: SupabaseClient;
   auth: SupabaseAuthClient;
@@ -17,14 +22,9 @@ interface Props {
   children?: ReactNode;
 }
 
-const AppContext = createContext({} as IAppContext);
+const AppContext = createContext<IAppContext>({} as IAppContext);
 
 const AppContextProvider = ({ children }: Props) => {
-  /* Creating a new instance of the Supabase client. */
-  const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-  const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
-  const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
-
   /* Setting the session state to null and then using the useEffect hook to set the session state to the
 session returned from the getSession() method. */
   const [currentSession, setSession] = useState<Session | null>(null);
@@ -37,14 +37,14 @@ session returned from the getSession() method. */
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
-  }, [supabase.auth]);
+  }, []);
 
   return (
     <AppContext.Provider
       value={{
         supabase,
         auth: supabase.auth,
-        currentSession,
+        currentSession: currentSession,
       }}
     >
       {children}
