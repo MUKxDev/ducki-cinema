@@ -1,76 +1,31 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/appContext";
+import { createVideoRoom } from "../database/supabase";
 
 export default function Dashboard() {
-  const { auth, supabase } = useAppContext();
+  const { auth } = useAppContext();
+  let navigate = useNavigate();
   const [url, setUrl] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   async function handleSubmit(e: any) {
     e.preventDefault();
 
-    console.log("Handling submit");
-    let videoActivityID = await createVideoActivity();
-    let videoRoomID;
-    if (videoActivityID) {
-      videoRoomID = await createVideoRoom(videoActivityID);
-    }
+    setLoading(true);
+
+    let videoRoomID = await createVideoRoom(url)
+      .then((id) => id)
+      .catch((error) => console.log("Dashboard => handleSubmit", error))
+      .finally(() => setLoading(false));
     if (videoRoomID) {
-      //TODO ROUTE TO ROOM PAGE with room data
-      // ? this query get the data required for video player depending on the room id
-      // const { data, error } = await supabase
-      //   .from("rooms")
-      //   .select(
-      //     `
-      //     id,
-      //     type,
-      //     videoActivities!inner(*)
-      //   `
-      //   )
-      //   .eq("id", videoRoomID);
-    }
-  }
-
-  async function createVideoRoom(videoActivityID: string) {
-    try {
-      const { data, error } = await supabase
-        .from("rooms")
-        .insert([{ videoActivityID: videoActivityID, type: "video" }])
-        .select("id");
-
-      if (error) console.log("createVideoRoom => error", error);
-      if (error) throw error;
-
-      console.log("createVideoRoom => data", data);
-      return data ? data[0].id : null;
-    } catch (error) {
-      console.log("createVideoRoom => error", error);
-
-      return null;
-    }
-  }
-
-  async function createVideoActivity(): Promise<string | null> {
-    try {
-      const { data, error } = await supabase
-        .from("videoActivities")
-        .insert([{ url: url }])
-        .select("id");
-
-      if (error) console.log("createVideoActivity => error", error);
-      if (error) throw error;
-
-      console.log("createVideoActivity => data", data);
-      return data ? data[0].id : null;
-    } catch (error) {
-      console.log("createVideoActivity => error", error);
-
-      return null;
+      navigate("/rooms/" + videoRoomID);
     }
   }
 
   return (
     <section
-      className="w-full px-3 antialiased bg-indigo-600 min-h-screen lg:px-6 tails-selected-element"
+      className="w-full min-h-screen px-3 antialiased bg-indigo-600 lg:px-6 tails-selected-element"
       data-primary="indigo-600"
       data-tails-scripts="//unpkg.com/alpinejs"
     >
@@ -126,15 +81,15 @@ export default function Dashboard() {
               className="w-full h-12 px-6 py-2 font-medium text-indigo-800 focus:outline-none"
               data-primary="indigo-800"
             />
-            <span className="relative top-0 right-0 block">
-              <button
-                type="submit"
-                className="inline-flex items-center w-32 h-12 px-8 text-base font-bold leading-6 text-white transition duration-150 ease-in-out bg-indigo-400 border border-transparent hover:bg-indigo-700 focus:outline-none active:bg-indigo-700"
-                data-primary="indigo-600"
-              >
-                Watch
-              </button>
-            </span>
+            <button
+              type="submit"
+              className={`rounded-l-none btn btn-secondary ${
+                loading && "loading"
+              }`}
+              data-primary="indigo-600"
+            >
+              Watch
+            </button>
           </form>
         </div>
       </div>

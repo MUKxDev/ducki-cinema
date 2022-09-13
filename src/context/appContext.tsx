@@ -11,7 +11,8 @@ import { SupabaseAuthClient } from "@supabase/supabase-js/dist/module/lib/Supaba
 /* Creating a new instance of the Supabase client. */
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
 const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
+
+export const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
 interface IAppContext {
   supabase: SupabaseClient;

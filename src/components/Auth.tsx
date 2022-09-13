@@ -44,6 +44,7 @@ export default function Auth() {
                 <span className="label-text">Email</span>
               </label>
               <input
+                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 type="text"

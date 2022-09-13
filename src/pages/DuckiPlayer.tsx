@@ -1,15 +1,49 @@
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
+import { supabase } from "../context/appContext";
+// import { realtimeClient } from "../context/appContext";
+import { VideoActivities } from "../database/interfaces";
 // import FilePlayer from "react-player/file";
 
 interface Props {
-  url: string;
+  videoActivitiy: VideoActivities;
 }
 
-export default function DuckiPlayer({ url }: Props) {
+export default function DuckiPlayer({ videoActivitiy }: Props) {
   const playerRef: MutableRefObject<ReactPlayer | null> = useRef(null);
+  const [url, setUrl] = useState("");
   const [seek, setSeek] = useState(0);
   const [playing, setPlaying] = useState(false);
+
+  useEffect(() => {
+    supabase
+      .channel("public:videoActivities")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "videoActivities",
+          filter: `id=eq.${videoActivitiy.id}`,
+        },
+        (payload: any) => {
+          setUrl(payload?.new?.url);
+          setSeek(payload?.new?.seek);
+          setPlaying(payload?.new?.isPlaying);
+        }
+      )
+      .subscribe();
+
+    return () => {};
+  }, [videoActivitiy.id]);
+
+  useEffect(() => {
+    if (videoActivitiy.url) {
+      setUrl(videoActivitiy.url!);
+    }
+
+    return () => {};
+  }, [videoActivitiy]);
 
   useEffect(() => {
     let currentTime = playerRef.current?.getCurrentTime() ?? 0;
