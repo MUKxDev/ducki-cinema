@@ -11,9 +11,10 @@ interface Props {
 
 export default function DuckiPlayer({ videoActivitiy }: Props) {
   const playerRef: MutableRefObject<ReactPlayer | null> = useRef(null);
-  const [url, setUrl] = useState("");
-  const [seek, setSeek] = useState(0);
-  const [playing, setPlaying] = useState(false);
+  const [url, setUrl] = useState(videoActivitiy.url ?? "");
+  const [updateUrl, setUpdateUrl] = useState(videoActivitiy.url ?? "");
+  const [seek, setSeek] = useState(videoActivitiy.seek ?? 0);
+  const [playing, setPlaying] = useState(videoActivitiy.isPlaying ?? false);
 
   useEffect(() => {
     supabase
@@ -28,7 +29,7 @@ export default function DuckiPlayer({ videoActivitiy }: Props) {
         },
         (payload: any) => {
           setUrl(payload?.new?.url);
-          setSeek(payload?.new?.seek);
+          playerRef.current?.seekTo(payload?.new?.seek);
           setPlaying(payload?.new?.isPlaying);
         }
       )
@@ -37,34 +38,67 @@ export default function DuckiPlayer({ videoActivitiy }: Props) {
     return () => {};
   }, [videoActivitiy.id]);
 
-  useEffect(() => {
-    if (videoActivitiy.url) {
-      setUrl(videoActivitiy.url!);
-    }
+  // useEffect(() => {
+  //   if (videoActivitiy.url) {
+  //     setUrl(videoActivitiy.url!);
+  //   }
 
-    return () => {};
-  }, [videoActivitiy]);
+  //   return () => {};
+  // }, [videoActivitiy]);
 
-  useEffect(() => {
-    let currentTime = playerRef.current?.getCurrentTime() ?? 0;
-    setSeek(currentTime);
-  }, []);
+  // useEffect(() => {
+  //   let currentTime = playerRef.current?.getCurrentTime() ?? 0;
+  //   setSeek(currentTime);
+  // }, []);
 
-  function seek50() {
-    console.log("SEEK 50 Clicked");
-    playerRef.current?.seekTo(0.5);
+  async function getData() {
+    setUrl(videoActivitiy.url!);
+    playerRef.current?.seekTo(videoActivitiy.seek!);
+    setPlaying(videoActivitiy.isPlaying!);
   }
 
-  function onSeek(seconds: number) {
-    console.log("onSeek => seconds", seconds);
+  async function onSeek(seconds: number) {
     setSeek(seconds);
   }
 
-  function play() {
-    setPlaying(true);
+  async function syncSeek() {
+    await supabase
+      .from("videoActivities")
+      .update({ seek: seek })
+      .eq("id", videoActivitiy.id);
   }
-  function pause() {
-    setPlaying(false);
+
+  async function handleSubmit(e: any) {
+    e.preventDefault();
+
+    await putUrl(updateUrl);
+  }
+
+  async function putUrl(thisUrl: string) {
+    setUrl(thisUrl);
+    await supabase
+      .from("videoActivities")
+      .update({ url: thisUrl })
+      .eq("id", videoActivitiy.id);
+  }
+
+  async function play() {
+    const { error } = await supabase
+      .from("videoActivities")
+      .update({ isPlaying: true })
+      .eq("id", videoActivitiy.id);
+    if (error) console.log(error);
+
+    // setPlaying(true);
+  }
+  async function pause() {
+    const { error } = await supabase
+      .from("videoActivities")
+      .update({ isPlaying: false })
+      .eq("id", videoActivitiy.id);
+    if (error) console.log(error);
+
+    // setPlaying(false);
   }
 
   return (
@@ -78,6 +112,18 @@ export default function DuckiPlayer({ videoActivitiy }: Props) {
         <p>
           This player is made to help you watch movies with your loved ones.
         </p>
+        <form className="flex w-full my-4" onSubmit={handleSubmit}>
+          <input
+            value={updateUrl}
+            onChange={(e) => setUpdateUrl(e.target.value)}
+            type="text"
+            title="updateUrl"
+            className="input input-bordered grow"
+          />
+          <button className="ml-4 btn btn-secondary" type="submit">
+            update
+          </button>
+        </form>
       </div>
       <div className="w-full p-3 border rounded-2xl bg-slate-100 border-slate-300">
         <div className="w-full not-prose rounded-xl overflow-clip">
@@ -87,23 +133,28 @@ export default function DuckiPlayer({ videoActivitiy }: Props) {
             width={"100%"}
             height={"100%"}
             onSeek={onSeek}
-            onPlay={play}
-            onPause={pause}
+            // onPlay={play}
+            // onPause={pause}
             url={url}
-            controls
+            controls={!playing}
             playsinline
+            onReady={getData}
           />
         </div>
       </div>
 
       <div className="flex items-center justify-center not-prose">
         <h3 className="p-2 rounded-md bg-slate-300 ">currnet seek is {seek}</h3>
-        <div
-          className="px-4 py-2 m-4 font-semibold text-white rounded-lg select-none bg-slate-800 hover:cursor-pointer"
-          onClick={seek50}
+        <button
+          disabled={playing}
+          type="button"
+          className={`${
+            playing && "!btn-disabled"
+          } px-4 py-2  m-4 font-semibold text-white rounded-lg select-none bg-slate-800 hover:cursor-pointer`}
+          onClick={syncSeek}
         >
-          Seek to 50
-        </div>
+          Sync Seek
+        </button>
         <div
           className="px-4 py-2 m-4 font-semibold text-white rounded-lg select-none bg-slate-800 hover:cursor-pointer"
           onClick={playing ? pause : play}
