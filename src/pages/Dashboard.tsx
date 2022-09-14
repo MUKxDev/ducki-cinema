@@ -7,6 +7,7 @@ export default function Dashboard() {
   const { auth } = useAppContext();
   let navigate = useNavigate();
   const [url, setUrl] = useState<string>("");
+  const [roomId, setRoomId] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   async function handleSubmit(e: any) {
@@ -21,6 +22,10 @@ export default function Dashboard() {
     if (videoRoomID) {
       navigate("/rooms/" + videoRoomID);
     }
+  }
+  async function handleRoomSubmit(e: any) {
+    e.preventDefault();
+    navigate("/rooms/" + roomId);
   }
 
   return (
@@ -73,7 +78,7 @@ export default function Dashboard() {
           >
             <input
               type="text"
-              name="email"
+              name="url"
               value={url}
               required
               onChange={(e) => setUrl(e.target.value)}
@@ -89,6 +94,31 @@ export default function Dashboard() {
               data-primary="indigo-600"
             >
               Watch
+            </button>
+          </form>
+          <form
+            onSubmit={handleRoomSubmit}
+            data-rounded="rounded-full"
+            className="relative flex items-center max-w-md mx-auto mt-12 overflow-hidden text-center rounded-full"
+          >
+            <input
+              type="text"
+              name="room"
+              value={roomId}
+              required
+              onChange={(e) => setRoomId(e.target.value)}
+              placeholder="Room ID"
+              className="w-full h-12 px-6 py-2 font-medium text-indigo-800 focus:outline-none"
+              data-primary="indigo-800"
+            />
+            <button
+              type="submit"
+              className={`rounded-l-none btn btn-accent ${
+                loading && "loading"
+              }`}
+              data-primary="indigo-600"
+            >
+              Enter
             </button>
           </form>
         </div>
