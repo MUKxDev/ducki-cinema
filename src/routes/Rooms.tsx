@@ -16,6 +16,7 @@ export default function Rooms() {
         setRoomData(roomData);
       }
     }
+    console.log("i fire once");
 
     setRoom();
   }, [params.id]);
@@ -52,6 +53,7 @@ export default function Rooms() {
       <h1>Room page</h1>
 
       <h4>{params.id}</h4>
+      <h4>{roomData?.videoActivities?.id}</h4>
       {roomData && buildRoom(roomData!.type)}
     </div>
   );

@@ -1,6 +1,6 @@
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
-import { supabase } from "../context/appContext";
+import { supabase, useAppContext } from "../context/appContext";
 // import { realtimeClient } from "../context/appContext";
 import { VideoActivities } from "../database/interfaces";
 // import FilePlayer from "react-player/file";
@@ -10,6 +10,7 @@ interface Props {
 }
 
 export default function DuckiPlayer({ videoActivitiy }: Props) {
+  const { currentSession } = useAppContext();
   const playerRef: MutableRefObject<ReactPlayer | null> = useRef(null);
   const [url, setUrl] = useState(videoActivitiy.url ?? "");
   const [updateUrl, setUpdateUrl] = useState(videoActivitiy.url ?? "");
@@ -25,31 +26,26 @@ export default function DuckiPlayer({ videoActivitiy }: Props) {
           event: "*",
           schema: "public",
           table: "videoActivities",
-          filter: `id=eq.${videoActivitiy.id}`,
+          filter: `id=eq.${videoActivitiy.id}, lastUpdatedBy=neq.${currentSession?.user.id}`,
         },
         (payload: any) => {
-          setUrl(payload?.new?.url);
-          playerRef.current?.seekTo(payload?.new?.seek);
-          setPlaying(payload?.new?.isPlaying);
+          if (payload.new.lastUpdatedBy !== currentSession?.user.id) {
+            setUrl(payload?.new?.url);
+            playerRef.current?.seekTo(payload?.new?.seek);
+            setSeek(payload?.new?.seek);
+            setPlaying(payload?.new?.isPlaying);
+            console.log("Updating from another user");
+            console.log("user", payload);
+          } else {
+            console.log("We dont need to update anything");
+            console.log("me", payload);
+          }
         }
       )
       .subscribe();
 
     return () => {};
-  }, [videoActivitiy.id]);
-
-  // useEffect(() => {
-  //   if (videoActivitiy.url) {
-  //     setUrl(videoActivitiy.url!);
-  //   }
-
-  //   return () => {};
-  // }, [videoActivitiy]);
-
-  // useEffect(() => {
-  //   let currentTime = playerRef.current?.getCurrentTime() ?? 0;
-  //   setSeek(currentTime);
-  // }, []);
+  }, [videoActivitiy.id, currentSession?.user.id]);
 
   async function getData() {
     setUrl(videoActivitiy.url!);
@@ -64,7 +60,7 @@ export default function DuckiPlayer({ videoActivitiy }: Props) {
   async function syncSeek() {
     await supabase
       .from("videoActivities")
-      .update({ seek: seek })
+      .update({ seek: seek, lastUpdatedBy: currentSession?.user.id })
       .eq("id", videoActivitiy.id);
   }
 
@@ -75,30 +71,45 @@ export default function DuckiPlayer({ videoActivitiy }: Props) {
   }
 
   async function putUrl(thisUrl: string) {
-    setUrl(thisUrl);
     await supabase
       .from("videoActivities")
-      .update({ url: thisUrl })
+      .update({
+        url: thisUrl,
+        isPlaying: false,
+        seek: 0.0,
+        lastUpdatedBy: currentSession?.user.id,
+      })
       .eq("id", videoActivitiy.id);
+    setUrl(thisUrl);
+    setPlaying(false);
+    playerRef.current?.seekTo(0.0);
   }
 
   async function play() {
     const { error } = await supabase
       .from("videoActivities")
-      .update({ isPlaying: true })
+      .update({
+        isPlaying: true,
+        seek: playerRef.current?.getCurrentTime(),
+        lastUpdatedBy: currentSession?.user.id,
+      })
       .eq("id", videoActivitiy.id);
     if (error) console.log(error);
 
-    // setPlaying(true);
+    setPlaying(true);
   }
   async function pause() {
     const { error } = await supabase
       .from("videoActivities")
-      .update({ isPlaying: false })
+      .update({
+        isPlaying: false,
+        seek: playerRef.current?.getCurrentTime(),
+        lastUpdatedBy: currentSession?.user.id,
+      })
       .eq("id", videoActivitiy.id);
     if (error) console.log(error);
 
-    // setPlaying(false);
+    setPlaying(false);
   }
 
   return (
@@ -133,8 +144,8 @@ export default function DuckiPlayer({ videoActivitiy }: Props) {
             width={"100%"}
             height={"100%"}
             onSeek={onSeek}
-            // onPlay={play}
-            // onPause={pause}
+            onPlay={play}
+            onPause={pause}
             url={url}
             controls={!playing}
             playsinline
@@ -144,7 +155,7 @@ export default function DuckiPlayer({ videoActivitiy }: Props) {
       </div>
 
       <div className="flex items-center justify-center not-prose">
-        <h3 className="p-2 rounded-md bg-slate-300 ">currnet seek is {seek}</h3>
+        <h3 className="p-2 rounded-md bg-slate-300 ">Last seek is {seek}</h3>
         <button
           disabled={playing}
           type="button"
