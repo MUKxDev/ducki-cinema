@@ -1,35 +1,24 @@
 import { supabase } from "../context/appContext";
-import { Convert, Room } from "./interfaces";
+
+// import { Convert, Room } from "./interfaces";
 
 /**
  * It gets the room data from the database and returns it as a Room object
  * @param {string} id - string - the room id
  * @returns Room | null
  */
-export async function getRoomData(id: string): Promise<Room | null> {
-  try {
-    const { data, error } = await supabase
-      .from("rooms")
-      .select(
-        `
-            id,
-            type,
-            videoActivities!inner(*)
-          `
-      )
-      .eq("id", id);
-    if (error) console.log("supabase => getRoomData", error);
-    if (error) throw error;
-
-    console.log("Room data", data);
-    if (data) {
-      return Convert.toRoom(JSON.stringify(data[0]));
-    } else {
-      return null;
-    }
-  } catch (error) {
-    return null;
-  }
+export async function getRoomData(id: string) {
+  return await supabase
+    .from("rooms")
+    .select(
+      `
+        id,
+        type,
+        videoActivities!inner(*)
+      `
+    )
+    .eq("id", id)
+    .single();
 }
 
 /**
@@ -38,10 +27,10 @@ export async function getRoomData(id: string): Promise<Room | null> {
  * @returns The video room ID
  */
 export async function createVideoRoom(url: string): Promise<string | null> {
-  let videoActivitiyID = await insertVideoActivity(url);
-  let roomVideoID;
-  if (videoActivitiyID) {
-    roomVideoID = await insertVideoRoom(videoActivitiyID);
+  let videoActivityID = await insertVideoActivity(url);
+  let roomVideoID = null;
+  if (videoActivityID) {
+    roomVideoID = await insertVideoRoom(videoActivityID);
   }
   return roomVideoID;
 }

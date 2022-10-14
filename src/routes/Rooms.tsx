@@ -1,34 +1,39 @@
 import { useEffect, useState } from "react";
+import { RoomResponseSuccess } from "../database/interfaces";
 import { useParams } from "react-router-dom";
-import { Room } from "../database/interfaces";
 import { getRoomData } from "../database/supabase";
 import DuckiPlayer from "../pages/DuckiPlayer";
 
 export default function Rooms() {
   let params = useParams();
-  //   const { supabase } = useAppContext();
-  const [roomData, setRoomData] = useState<Room | null>(null);
+  const [roomData, setRoomData] = useState<RoomResponseSuccess | null>(null);
 
   useEffect(() => {
     async function setRoom() {
       if (params.id) {
-        let roomData: Room | null = await getRoomData(params.id);
+        let roomData: RoomResponseSuccess | null = await getRoomData(
+          params.id
+        ).then((response) =>
+          response.status === 200
+            ? (response.data as RoomResponseSuccess)
+            : null
+        );
+
         setRoomData(roomData);
       }
     }
-    console.log("i fire once");
 
     setRoom();
   }, [params.id]);
 
-  function buildRoom(type: string | undefined) {
+  function buildRoom(type: string | null) {
     switch (type) {
       case "video":
         return (
           <div>
             <h1>video type</h1>
             {roomData!.videoActivities?.url && (
-              <DuckiPlayer videoActivitiy={roomData!.videoActivities} />
+              <DuckiPlayer videoActivity={roomData!.videoActivities} />
             )}
           </div>
         );

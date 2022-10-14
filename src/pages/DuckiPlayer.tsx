@@ -1,20 +1,23 @@
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
+import { Range } from "react-range";
 import { supabase, useAppContext } from "../context/appContext";
-// import { realtimeClient } from "../context/appContext";
 import { VideoActivities } from "../database/interfaces";
+// import { realtimeClient } from "../context/appContext";
+
 // import FilePlayer from "react-player/file";
 
 interface Props {
-  videoActivitiy: VideoActivities;
+  videoActivity: VideoActivities;
 }
 
-export default function DuckiPlayer({ videoActivitiy }: Props) {
+export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
   const { currentSession } = useAppContext();
   const playerRef: MutableRefObject<ReactPlayer | null> = useRef(null);
   const [url, setUrl] = useState(videoActivitiy.url ?? "");
   const [updateUrl, setUpdateUrl] = useState(videoActivitiy.url ?? "");
   const [seek, setSeek] = useState(videoActivitiy.seek ?? 0);
+  const [duration, setDuration] = useState(0);
   const [playing, setPlaying] = useState(videoActivitiy.isPlaying ?? false);
 
   useEffect(() => {
@@ -26,7 +29,7 @@ export default function DuckiPlayer({ videoActivitiy }: Props) {
           event: "*",
           schema: "public",
           table: "videoActivities",
-          filter: `id=eq.${videoActivitiy.id}, lastUpdatedBy=neq.${currentSession?.user.id}`,
+          filter: `id=eq.${videoActivitiy.id}`,
         },
         (payload: any) => {
           if (payload.new.lastUpdatedBy !== currentSession?.user.id) {
@@ -37,8 +40,8 @@ export default function DuckiPlayer({ videoActivitiy }: Props) {
             console.log("Updating from another user");
             console.log("user", payload);
           } else {
-            console.log("We dont need to update anything");
-            console.log("me", payload);
+            // console.log("We don't need to update anything");
+            // console.log("me", payload);
           }
         }
       )
@@ -83,6 +86,17 @@ export default function DuckiPlayer({ videoActivitiy }: Props) {
     setUrl(thisUrl);
     setPlaying(false);
     playerRef.current?.seekTo(0.0);
+  }
+
+  function pip() {
+    let v: HTMLVideoElement | null = document.querySelector("Video");
+    if (v) {
+      if (Boolean(document.pictureInPictureElement)) {
+        document.exitPictureInPicture();
+      } else {
+        v.requestPictureInPicture();
+      }
+    }
   }
 
   async function play() {
@@ -144,18 +158,23 @@ export default function DuckiPlayer({ videoActivitiy }: Props) {
             width={"100%"}
             height={"100%"}
             onSeek={onSeek}
-            onPlay={play}
-            onPause={pause}
+            // onPlay={play}
+            // onPause={pause}
             url={url}
-            controls={!playing}
+            controls={false}
+            // controls={!playing}
             playsinline
             onReady={getData}
+            onDuration={setDuration}
           />
         </div>
       </div>
 
       <div className="flex items-center justify-center not-prose">
-        <h3 className="p-2 rounded-md bg-slate-300 ">Last seek is {seek}</h3>
+        <div className="flex flex-col space-y-4">
+          <h3 className="p-2 rounded-md bg-slate-300 ">Last seek is {seek}</h3>
+        </div>
+
         <button
           disabled={playing}
           type="button"
@@ -172,6 +191,35 @@ export default function DuckiPlayer({ videoActivitiy }: Props) {
         >
           {playing ? "pause" : "play"}
         </div>
+        <div
+          className="px-4 py-2 m-4 font-semibold text-white rounded-lg select-none bg-slate-800 hover:cursor-pointer"
+          onClick={pip}
+        >
+          {"pip"}
+        </div>
+      </div>
+      {/* Slider */}
+      <div className={" m-4 border bg-primary rounded-full p-3"}>
+        <Range
+          min={0.0}
+          max={duration === 0 ? 9999999 : duration}
+          onChange={(values) => {
+            setSeek(values[0]);
+            playerRef.current?.seekTo(values[0]);
+          }}
+          values={[seek]}
+          renderThumb={({ props }) => (
+            <div
+              {...props}
+              className={"w-4  aspect-square bg-white rounded-full"}
+            />
+          )}
+          renderTrack={({ props, children }) => (
+            <div {...props} className={"w-full h-2 bg-white rounded-full"}>
+              {children}
+            </div>
+          )}
+        ></Range>
       </div>
     </div>
   );

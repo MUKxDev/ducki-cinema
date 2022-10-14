@@ -7,12 +7,13 @@ import {
 } from "react";
 import { createClient, Session, SupabaseClient } from "@supabase/supabase-js";
 import { SupabaseAuthClient } from "@supabase/supabase-js/dist/module/lib/SupabaseAuthClient";
+import { Database } from "../database/database.types";
 
 /* Creating a new instance of the Supabase client. */
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
 const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
+export const supabase = createClient<Database>(supabaseUrl!, supabaseAnonKey!);
 
 interface IAppContext {
   supabase: SupabaseClient;

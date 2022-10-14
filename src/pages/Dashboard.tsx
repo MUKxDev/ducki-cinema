@@ -32,7 +32,6 @@ export default function Dashboard() {
     <section
       className="w-full min-h-screen px-3 antialiased bg-indigo-600 lg:px-6 tails-selected-element"
       data-primary="indigo-600"
-      data-tails-scripts="//unpkg.com/alpinejs"
     >
       <div className="mx-auto max-w-7xl">
         <nav className="flex items-center w-full h-24 select-none">
