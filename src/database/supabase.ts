@@ -1,11 +1,8 @@
 import { supabase } from "../context/appContext";
 
-// import { Convert, Room } from "./interfaces";
-
 /**
- * It gets the room data from the database and returns it as a Room object
- * @param {string} id - string - the room id
- * @returns Room | null
+ * Get the room data for the given room id.
+ * @param {string} id - string - The id of the room we want to get data for
  */
 export async function getRoomData(id: string) {
   return await supabase
@@ -81,4 +78,28 @@ async function insertVideoActivity(url: string): Promise<string | null> {
 
     return null;
   }
+}
+
+/**
+ * It inserts a new chat message into the database.
+ * @param {string} message - The message that the user is sending
+ * @param {string} profileID - The ID of the profile that sent the message
+ * @param {string} roomID - The ID of the room you want to insert the chat into
+ * @returns The id of the chat that was just inserted.
+ */
+export async function insertChat(
+  message: string,
+  profileID: string,
+  roomID: string
+) {
+  const { data, error } = await supabase
+    .from("chats")
+    .insert([{ message: message, profileID: profileID, roomID: roomID }])
+    .select("id")
+    .single();
+
+  if (error) console.log(error);
+  if (error) throw error;
+
+  return data;
 }

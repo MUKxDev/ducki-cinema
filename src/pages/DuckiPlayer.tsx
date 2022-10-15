@@ -24,7 +24,7 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
   const [isPip, setIsPip] = useState(false);
 
   useEffect(() => {
-    supabase
+    let subscription = supabase
       .channel("public:videoActivities")
       .on(
         "postgres_changes",
@@ -50,7 +50,9 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
       )
       .subscribe();
 
-    return () => {};
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [videoActivitiy.id, currentSession?.user.id]);
 
   async function getData() {

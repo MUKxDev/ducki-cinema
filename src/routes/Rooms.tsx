@@ -64,7 +64,7 @@ export default function Rooms() {
       {roomData && (
         <div className="p-4">
           {" "}
-          <Chat></Chat>
+          <Chat roomID={roomData.id}></Chat>
         </div>
       )}
     </div>
