@@ -10,7 +10,7 @@ import Dashboard from "../pages/Dashboard";
 export default function StartUp() {
   const { currentSession } = useAppContext();
   return (
-    <div className="">
+    <div className="w-full">
       {!currentSession ? (
         <Auth />
       ) : (

@@ -30,8 +30,8 @@ export default function Rooms() {
     switch (type) {
       case "video":
         return (
-          <div>
-            <h1>video type</h1>
+          <div className="w-full">
+            {/* <h1>video type</h1> */}
             {roomData!.videoActivities?.url && (
               <DuckiPlayer videoActivity={roomData!.videoActivities} />
             )}
@@ -54,11 +54,11 @@ export default function Rooms() {
   }
 
   return (
-    <div className="container mx-auto prose">
-      <h1>Room page</h1>
+    <div className="!container mx-auto prose">
+      {/* <h1>Room page</h1>
 
       <h4>{params.id}</h4>
-      <h4>{roomData?.videoActivities?.id}</h4>
+      <h4>{roomData?.videoActivities?.id}</h4> */}
       {roomData && buildRoom(roomData!.type)}
     </div>
   );
