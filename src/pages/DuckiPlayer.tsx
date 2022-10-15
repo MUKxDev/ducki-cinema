@@ -132,7 +132,7 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
   }
 
   return (
-    <div className="p-4 mx-auto space-y-4 prose-slate">
+    <div className="p-4 mx-auto space-y-4 prose !container prose-slate ">
       <div className="flex flex-col items-start justify-start">
         <h1>Ducki.</h1>
 

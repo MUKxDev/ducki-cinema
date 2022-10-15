@@ -3,6 +3,7 @@ import { RoomResponseSuccess } from "../database/interfaces";
 import { useParams } from "react-router-dom";
 import { getRoomData } from "../database/supabase";
 import DuckiPlayer from "../pages/DuckiPlayer";
+import Chat from "../components/Chat";
 
 export default function Rooms() {
   let params = useParams();
@@ -54,12 +55,18 @@ export default function Rooms() {
   }
 
   return (
-    <div className="!container mx-auto prose">
+    <div className="flex flex-col h-screen mx-auto  lg:flex-row">
       {/* <h1>Room page</h1>
 
       <h4>{params.id}</h4>
       <h4>{roomData?.videoActivities?.id}</h4> */}
       {roomData && buildRoom(roomData!.type)}
+      {roomData && (
+        <div className="p-4">
+          {" "}
+          <Chat></Chat>
+        </div>
+      )}
     </div>
   );
 }
