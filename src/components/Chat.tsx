@@ -52,6 +52,8 @@ export default function Chat({ roomID }: Props) {
     }
     setNewChat(null);
     return () => {};
+    // ! FIND A FIX FOR THIS LATER
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newChat]);
 
   async function handleSubmit(e: any) {
