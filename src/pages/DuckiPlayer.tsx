@@ -134,7 +134,7 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
   }
 
   return (
-    <div className="p-4 mx-auto space-y-4 prose !container prose-slate ">
+    <div className="p-4 mx-auto h-full space-y-4 prose flex flex-col !container prose-slate ">
       <div className="flex flex-col items-start justify-start">
         <h1>Ducki.</h1>
 
@@ -152,8 +152,8 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
         </form>
       </div>
       {/* Player & controls */}
-      <div className="flex flex-col py-4 space-y-4">
-        <div className="w-full border rounded-xl bg-slate-100 border-slate-300 overflow-clip">
+      <div className="flex flex-col py-4 space-y-4 overflow-hidden grow">
+        <div className="border rounded-xl w-fit h-fit !aspect-video mx-auto bg-slate-100 border-slate-300 overflow-clip">
           <div className="not-prose rounded-xl overflow-clip">
             <ReactPlayer
               playing={playing}
