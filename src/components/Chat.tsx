@@ -52,6 +52,7 @@ export default function Chat({ roomID }: Props) {
     }
     setNewChat(null);
     return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newChat]);
 
   async function handleSubmit(e: any) {
@@ -78,16 +79,16 @@ export default function Chat({ roomID }: Props) {
 
   return (
     <div
-      className={`w-full h-[95%] flex flex-col rounded-xl duration-200 lg:w-96  ${
+      className={`w-full h-full max-h-60 lg:max-h-max lg:h-[95%] flex flex-col rounded-xl duration-200 lg:w-96  ${
         collapse && "!w-20"
       }`}
     >
       <div
-        className={`w-full h-[95%] fixed right-6 flex flex-col p-4 bg-slate-200 rounded-xl duration-200 lg:w-96  ${
+        className={` lg:h-[95%] w-full h-full max-h-60 lg:max-h-max lg:fixed left-6 lg:left-auto right-6 flex flex-col p-4 bg-slate-200 rounded-xl duration-200 lg:w-96  ${
           collapse && "!w-20"
         }`}
       >
-        <div className="">
+        <div className="flex-col hidden lg:flex">
           <div
             onClick={() => {
               setCollapse(!collapse);
@@ -105,14 +106,14 @@ export default function Chat({ roomID }: Props) {
         </div>
         {
           <div
-            className={`w-full grow overflow-hidden prose mt-4 flex flex-col ${
+            className={`w-full grow max-w-full overflow-hidden prose mt-4 flex flex-col ${
               collapse && "hidden"
             }`}
           >
-            <h1>Chat</h1>
+            <h1 className={"hidden lg:block"}>Chat</h1>
             <div
               className={
-                "w-full grow overflow-y-scroll bg-slate-100 rounded-lg p-3 space-y-2 flex flex-col"
+                "w-full grow overflow-y-scroll bg-slate-100 min-h-[100px] rounded-lg p-3 space-y-2 flex flex-col"
               }
             >
               {chats.map((chat) => (
@@ -130,7 +131,7 @@ export default function Chat({ roomID }: Props) {
             {/* Text field */}
             <form
               onSubmit={handleSubmit}
-              className="flex mt-4 space-x-3 min-h-fit"
+              className="flex w-full mt-4 space-x-3 min-h-fit"
             >
               <input
                 id="chat-text-field"

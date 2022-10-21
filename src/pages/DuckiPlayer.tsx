@@ -23,6 +23,8 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
   const [playing, setPlaying] = useState(videoActivitiy.isPlaying ?? false);
   const [isPip, setIsPip] = useState(false);
 
+  useEffect(() => {});
+
   useEffect(() => {
     let subscription = supabase
       .channel("public:videoActivities")
@@ -134,17 +136,24 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
   }
 
   return (
-    <div className="p-4 mx-auto h-full space-y-4 prose flex flex-col !container prose-slate ">
+    <div className="px-4  py-4   mx-auto h-full space-y-4 prose flex flex-col !container prose-slate ">
       <div className="flex flex-col items-start justify-start">
-        <h1>Ducki.</h1>
+        <div className="w-1/4 pb-4 pl-6 pr-4 md:pl-4">
+          <span className="p-1 text-xl font-black leading-none select-none text-slate-600">
+            <span className="">Ducki</span>
+            <span className="text-indigo-300" data-primary="indigo-300">
+              .
+            </span>
+          </span>
+        </div>
 
-        <form className="flex w-full " onSubmit={handleSubmit}>
+        <form className="flex w-full max-w-3xl mx-auto" onSubmit={handleSubmit}>
           <input
             value={updateUrl}
             onChange={(e) => setUpdateUrl(e.target.value)}
             type="text"
             title="updateUrl"
-            className="input input-bordered grow"
+            className="input bg-slate-100 input-bordered grow"
           />
           <button className="ml-4 btn btn-accent" type="submit">
             update
@@ -175,7 +184,8 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
               onProgress={(state) => setSeek(state.playedSeconds)}
               url={url}
               controls={false}
-              playsinline
+              playsinline={true}
+              webkit-playsinline={true}
               onReady={getData}
               onDuration={setDuration}
             />
@@ -183,7 +193,11 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
         </div>
 
         {/* Controls */}
-        <div className={"p-3 rounded-xl bg-slate-200 flex flex-col space-y-3"}>
+        <div
+          className={
+            "p-3 rounded-xl w-full max-w-7xl mx-auto bg-slate-200 flex flex-col space-y-3"
+          }
+        >
           <div className="flex items-center justify-between not-prose ">
             <div className="" onClick={playing ? pause : play}>
               {playing ? (
@@ -193,7 +207,7 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
               )}
             </div>
             {/* desktop slider */}
-            <div className={"p-3 lg:block hidden grow"}>
+            <div className={"p-3 md:block hidden grow"}>
               <Range
                 min={0.0}
                 max={_.ceil(duration)}
@@ -243,7 +257,7 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
           </div>
 
           {/* Mobile Slider */}
-          <div className={"p-3 lg:hidden"}>
+          <div className={"p-3 md:hidden"}>
             <Range
               min={0.0}
               max={_.ceil(duration)}

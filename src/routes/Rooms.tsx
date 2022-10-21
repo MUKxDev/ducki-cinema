@@ -55,14 +55,14 @@ export default function Rooms() {
   }
 
   return (
-    <div className="flex flex-col h-screen mx-auto  lg:flex-row">
+    <div className="flex flex-col h-screen mx-auto lg:flex-row">
       {/* <h1>Room page</h1>
 
       <h4>{params.id}</h4>
       <h4>{roomData?.videoActivities?.id}</h4> */}
       {roomData && buildRoom(roomData!.type)}
       {roomData && (
-        <div className="p-4">
+        <div className="h-full p-4 px-4 pt-0 pb-4 lg:pt-4 lg:h-auto">
           {" "}
           <Chat roomID={roomData.id}></Chat>
         </div>
