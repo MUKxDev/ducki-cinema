@@ -52,8 +52,6 @@ export default function Chat({ roomID }: Props) {
     }
     setNewChat(null);
     return () => {};
-    // ! FIND A FIX FOR THIS LATER
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newChat]);
 
   async function handleSubmit(e: any) {
@@ -89,7 +87,7 @@ export default function Chat({ roomID }: Props) {
           collapse && "!w-20"
         }`}
       >
-        <div>
+        <div className="">
           <div
             onClick={() => {
               setCollapse(!collapse);
@@ -100,21 +98,21 @@ export default function Chat({ roomID }: Props) {
             {collapse ? <ArrowClose className="mx-auto" /> : <ArrowOpen />}
           </div>
           {!isEmpty(unReadMessages) && collapse && (
-            <h2 className="p-1 mt-3 rounded-full aspect-square flex justify-center items-center bg-accent">
+            <h2 className="flex items-center justify-center p-1 mt-3 rounded-full aspect-square bg-accent">
               {unReadMessages.length}
             </h2>
           )}
         </div>
         {
           <div
-            className={`w-full grow prose mt-4 flex flex-col ${
+            className={`w-full grow overflow-hidden prose mt-4 flex flex-col ${
               collapse && "hidden"
             }`}
           >
             <h1>Chat</h1>
             <div
               className={
-                "w-full h-full relative bg-slate-100 rounded-lg p-3 space-y-2 flex flex-col"
+                "w-full grow overflow-y-scroll bg-slate-100 rounded-lg p-3 space-y-2 flex flex-col"
               }
             >
               {chats.map((chat) => (
@@ -130,7 +128,10 @@ export default function Chat({ roomID }: Props) {
               ))}
             </div>
             {/* Text field */}
-            <form onSubmit={handleSubmit} className="mt-4 flex space-x-3">
+            <form
+              onSubmit={handleSubmit}
+              className="flex mt-4 space-x-3 min-h-fit"
+            >
               <input
                 id="chat-text-field"
                 type="text"
