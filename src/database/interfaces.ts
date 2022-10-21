@@ -9,3 +9,4 @@ export type RoomResponseSuccess = RoomResponse["data"] & {
 export type VideoActivities =
   Database["public"]["Tables"]["videoActivities"]["Row"];
 export type Chats = Database["public"]["Tables"]["chats"]["Row"];
+export type Profiles = Database["public"]["Tables"]["profiles"]["Row"];

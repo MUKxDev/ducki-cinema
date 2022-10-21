@@ -19,6 +19,8 @@ interface IAppContext {
   supabase: SupabaseClient;
   auth: SupabaseAuthClient;
   currentSession: Session | null;
+  users: string[];
+  setUsers: (users: string[]) => void;
 }
 interface Props {
   children?: ReactNode;
@@ -30,6 +32,18 @@ const AppContextProvider = ({ children }: Props) => {
   /* Setting the session state to null and then using the useEffect hook to set the session state to the
 session returned from the getSession() method. */
   const [currentSession, setSession] = useState<Session | null>(null);
+  const [users, setUsers] = useState<string[]>([]);
+
+  useEffect(
+    () => {
+      if (currentSession) {
+        setUsers([...users, currentSession.user.id]);
+      }
+    },
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentSession]
+  );
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -47,6 +61,8 @@ session returned from the getSession() method. */
         supabase,
         auth: supabase.auth,
         currentSession: currentSession,
+        users: users,
+        setUsers: setUsers,
       }}
     >
       {children}

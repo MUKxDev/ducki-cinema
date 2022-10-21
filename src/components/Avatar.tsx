@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import uploadSvg from "../assets/upload.svg";
 import { useAppContext } from "../context/appContext";
-
+import duckAvatar from "../assets/duckAvatar.png";
 export default function Avatar(props: {
   url: string;
   size: string | number;
@@ -75,11 +75,7 @@ export default function Avatar(props: {
     >
       <div className="rounded-lg avatar w-36 aspect-square overflow-clip">
         <img
-          src={
-            avatarUrl
-              ? avatarUrl
-              : `https://place-hold.it/${props.size}x${props.size}`
-          }
+          src={avatarUrl ? avatarUrl : duckAvatar}
           alt={avatarUrl ? "Avatar" : "No image"}
           className={` !w-[${props.size}px] !h-[${props.size}px]`}
         />

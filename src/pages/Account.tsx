@@ -79,11 +79,14 @@ function Account() {
 
   return (
     <div
-      className="p-6 m-4 mx-auto prose border rounded-lg bg-base-100 border-base-200"
+      className="flex flex-col justify-center p-6 m-4 mx-auto prose border rounded-lg bg-base-100 border-base-200"
       aria-live="polite"
     >
       {
-        <form onSubmit={updateProfile} className="flex flex-col gap-3">
+        <form
+          onSubmit={updateProfile}
+          className="flex flex-col items-center gap-3"
+        >
           <Avatar
             url={avatar_url ?? ""}
             size={150}
@@ -93,34 +96,34 @@ function Account() {
               //   await updateProfile(null);
             }}
           />
-          <div className="">Email: {currentSession?.user.email} </div>
-          <div className="flex items-center ">
+          <div className="disabled">Email: {currentSession?.user.email} </div>
+          <div className="flex items-center w-full">
             <label className="min-w-[100px]" htmlFor="username">
               UserName
             </label>
             <input
               id="username"
               type="text"
-              className="input input-bordered"
+              className="input input-bordered grow"
               value={username || ""}
               onChange={(e: any) => setUsername(e.target.value)}
             />
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center w-full">
             <label className="min-w-[100px]" htmlFor="displayname">
               DisplayName
             </label>
             <input
               id="displayname"
               type="text"
-              className="input input-bordered"
+              className="input input-bordered grow"
               value={displayname || ""}
               onChange={(e: any) => setDisplayName(e.target.value)}
             />
           </div>
-          <div className="flex ">
+          <div className="flex w-full">
             <button
-              className={`btn btn-primary ${loading && "loading"}`}
+              className={`btn w-full btn-primary ${loading && "loading"}`}
               type="submit"
               disabled={loading}
             >

@@ -2,9 +2,15 @@ import { useEffect, useState } from "react";
 import { ReactComponent as ArrowOpen } from "../assets/icons/arrow=open.svg";
 import { ReactComponent as ArrowClose } from "../assets/icons/arrow=close.svg";
 import { supabase, useAppContext } from "../context/appContext";
-import { insertChat } from "../database/supabase";
-import { Chats } from "../database/interfaces";
-import { isEmpty } from "lodash";
+import {
+  fetchProfiles,
+  fetchRoomChats,
+  insertChat,
+} from "../database/supabase";
+import { Chats, Profiles } from "../database/interfaces";
+import { isEmpty, find, uniqBy } from "lodash";
+import { useQuery } from "@tanstack/react-query";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 interface Props {
   roomID: string;
@@ -18,30 +24,54 @@ export default function Chat({ roomID }: Props) {
   const [unReadMessages, setUnReadMessages] = useState<Chats[]>([]);
   const [newChat, setNewChat] = useState<Chats | null>(null);
 
-  const { currentSession } = useAppContext();
+  const { currentSession, users, setUsers } = useAppContext();
 
   useEffect(() => {
-    let subscription = supabase
-      .channel("public:chats")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "chats",
-          filter: `roomID=eq.${roomID}`,
-        },
-        (payload) => {
-          console.log("chat");
-          setNewChat(payload.new as Chats);
-        }
-      )
-      .subscribe();
-    console.log("new subscription created");
+    fetchRoomChats(roomID).then((data) => {
+      if (data) {
+        setChats(data);
+
+        setUsers(uniqBy(data, "profileID").map((value) => value.profileID!));
+
+        profilesQuery.refetch();
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomID]);
+
+  const profilesQuery = useQuery<Profiles[]>(["profiles"], () =>
+    fetchProfiles(users)
+  );
+
+  useEffect(() => {
+    let subscription: RealtimeChannel;
+    if (roomID) {
+      subscription = supabase
+        .channel("public:chats")
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "chats",
+            filter: `roomID=eq.${roomID}`,
+          },
+          (payload) => {
+            if ((payload.new as Chats).profileID) {
+              if (users.indexOf((payload.new as Chats).profileID!) === -1) {
+                setUsers([...users, (payload.new as Chats).profileID!]);
+              }
+            }
+            setNewChat(payload.new as Chats);
+          }
+        )
+        .subscribe();
+    }
 
     return () => {
-      subscription.unsubscribe();
+      subscription?.unsubscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomID]);
 
   useEffect(() => {
@@ -119,11 +149,22 @@ export default function Chat({ roomID }: Props) {
               {chats.map((chat) => (
                 <div
                   key={chat.id}
-                  className={`max-w-[80%] px-2 py-1 self-start bg-slate-300 rounded-md flex  ${
+                  className={`max-w-[80%]  flex-col px-2 py-1 self-start bg-slate-300 rounded-md flex  ${
                     chat.profileID === currentSession?.user.id &&
                     "!self-end !bg-blue-500 !text-white"
                   }`}
                 >
+                  <p
+                    className={`m-0 text-2xs text-slate-400 ${
+                      chat.profileID === currentSession?.user.id &&
+                      " !text-white/50"
+                    }`}
+                  >
+                    {find(
+                      profilesQuery.data,
+                      (value) => value.id === chat.profileID
+                    )?.displayname ?? "unknown"}
+                  </p>
                   <p className={"m-0"}>{chat.message}</p>
                 </div>
               ))}

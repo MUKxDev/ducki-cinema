@@ -1,4 +1,5 @@
 import { supabase } from "../context/appContext";
+import { Chats, Profiles } from "./interfaces";
 
 /**
  * Get the room data for the given room id.
@@ -102,4 +103,35 @@ export async function insertChat(
   if (error) throw error;
 
   return data;
+}
+
+export async function fetchRoomChats(roomId: string): Promise<Chats[]> {
+  let temp: Chats[] = [];
+
+  const { data } = await supabase
+    .from("chats")
+    .select("*")
+    .eq("roomID", roomId);
+
+  if (data) {
+    return data;
+  }
+
+  return temp;
+}
+export async function fetchProfiles(users: string[]): Promise<Profiles[]> {
+  let temp: Profiles[] = [];
+  for await (const id of users) {
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (data) {
+      temp.push(data as Profiles);
+    }
+  }
+
+  return temp;
 }

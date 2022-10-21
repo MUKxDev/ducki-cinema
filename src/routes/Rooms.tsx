@@ -1,13 +1,27 @@
 import { useEffect, useState } from "react";
-import { RoomResponseSuccess } from "../database/interfaces";
+import { Profiles, RoomResponseSuccess } from "../database/interfaces";
 import { useParams } from "react-router-dom";
-import { getRoomData } from "../database/supabase";
-import DuckiPlayer from "../pages/DuckiPlayer";
+import { fetchProfiles, getRoomData } from "../database/supabase";
+import DuckiPlayer from "../components/DuckiPlayer";
 import Chat from "../components/Chat";
+import { useQuery } from "@tanstack/react-query";
+import { useAppContext } from "../context/appContext";
 
 export default function Rooms() {
   let params = useParams();
+  const { users } = useAppContext();
   const [roomData, setRoomData] = useState<RoomResponseSuccess | null>(null);
+
+  const profilesQuery = useQuery<Profiles[]>(["profiles"], () =>
+    fetchProfiles(users)
+  );
+
+  useEffect(() => {
+    profilesQuery.refetch();
+
+    return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [users]);
 
   useEffect(() => {
     async function setRoom() {

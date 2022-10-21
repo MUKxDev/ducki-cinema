@@ -2,19 +2,23 @@ import { MutableRefObject, useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import { getTrackBackground, Range } from "react-range";
 import { supabase, useAppContext } from "../context/appContext";
-import { VideoActivities } from "../database/interfaces";
+import { Profiles, VideoActivities } from "../database/interfaces";
 import { ReactComponent as PipOpen } from "../assets/icons/pip=open.svg";
 import { ReactComponent as PipClose } from "../assets/icons/pip=close.svg";
 import { ReactComponent as Play } from "../assets/icons/play-pause=play.svg";
 import { ReactComponent as Pause } from "../assets/icons/play-pause=pause.svg";
-import _ from "lodash";
+import { useQuery } from "@tanstack/react-query";
+import { fetchProfiles } from "../database/supabase";
+import { find, ceil } from "lodash";
+
+import duckAvatar from "../assets/duckAvatar.png";
 
 interface Props {
   videoActivity: VideoActivities;
 }
 
 export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
-  const { currentSession } = useAppContext();
+  const { currentSession, users, setUsers } = useAppContext();
   const playerRef: MutableRefObject<ReactPlayer | null> = useRef(null);
   const [url, setUrl] = useState(videoActivitiy.url ?? "");
   const [updateUrl, setUpdateUrl] = useState(videoActivitiy.url ?? "");
@@ -22,8 +26,13 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
   const [duration, setDuration] = useState(999999);
   const [playing, setPlaying] = useState(videoActivitiy.isPlaying ?? false);
   const [isPip, setIsPip] = useState(false);
+  const [lastUpdatedById, setLastUpdatedById] = useState<string>(
+    currentSession?.user.id ?? ""
+  );
 
-  useEffect(() => {});
+  const profilesQuery = useQuery<Profiles[]>(["profiles"], () =>
+    fetchProfiles(users)
+  );
 
   useEffect(() => {
     let subscription = supabase
@@ -44,7 +53,14 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
             setPlaying(payload?.new?.isPlaying);
             console.log("Updating from another user");
             console.log("user", payload);
+            if (payload.new.lastUpdatedBy) {
+              if (users.indexOf(payload.new.lastUpdatedBy) === -1) {
+                setUsers([...users, payload.new.lastUpdatedBy]);
+              }
+              setLastUpdatedById(payload.new.lastUpdatedBy);
+            }
           } else {
+            setLastUpdatedById(payload.new.lastUpdatedBy);
             // console.log("We don't need to update anything");
             // console.log("me", payload);
           }
@@ -55,6 +71,7 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
     return () => {
       subscription.unsubscribe();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoActivitiy.id, currentSession?.user.id]);
 
   async function getData() {
@@ -138,32 +155,57 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
   return (
     <div className="px-4  py-4   mx-auto h-full space-y-4 prose flex flex-col !container prose-slate ">
       <div className="flex flex-col items-start justify-start">
-        <div className="w-1/4 pb-4 pl-6 pr-4 md:pl-4">
+        <a href="/" className="w-1/4 pb-4 pl-6 pr-4 no-underline md:pl-4">
           <span className="p-1 text-xl font-black leading-none select-none text-slate-600">
             <span className="">Ducki</span>
             <span className="text-indigo-300" data-primary="indigo-300">
               .
             </span>
           </span>
-        </div>
+        </a>
+        <div className="flex items-center justify-between w-full gap-3 mx-auto max-w-7xl">
+          <div className="flex items-center gap-3 p-3 border rounded-md border-slate-300 input grow min-w-fit not-prose">
+            {/* <p className={"text-2xs"}>Last updated by:</p> */}
+            <div className={"avatar "}>
+              <div className={"w-8 h-8 rounded-full"}>
+                <img
+                  src={
+                    find(
+                      profilesQuery.data,
+                      (value) => value.id === lastUpdatedById
+                    )?.avatar_url ?? duckAvatar
+                  }
+                  alt=""
+                />
+              </div>
+            </div>
+            <p className={"text-xs text-blue-500 font-semibold"}>
+              {find(profilesQuery.data, (value) => value.id === lastUpdatedById)
+                ?.displayname ?? "unknown"}
+            </p>
+          </div>
 
-        <form className="flex w-full max-w-3xl mx-auto" onSubmit={handleSubmit}>
-          <input
-            value={updateUrl}
-            onChange={(e) => setUpdateUrl(e.target.value)}
-            type="text"
-            title="updateUrl"
-            className="input bg-slate-100 input-bordered grow"
-          />
-          <button className="ml-4 btn btn-accent" type="submit">
-            update
-          </button>
-        </form>
+          <form className="flex max-w-3xl mx-auto grow" onSubmit={handleSubmit}>
+            <input
+              value={updateUrl}
+              onChange={(e) => setUpdateUrl(e.target.value)}
+              type="text"
+              title="updateUrl"
+              className="input bg-slate-100 input-bordered grow"
+            />
+            <button className="ml-4 btn btn-accent" type="submit">
+              update
+            </button>
+          </form>
+        </div>
       </div>
       {/* Player & controls */}
       <div className="flex flex-col py-4 space-y-4 overflow-hidden grow">
-        <div className="border rounded-xl w-fit h-fit !aspect-video mx-auto bg-slate-100 border-slate-300 overflow-clip">
-          <div className="not-prose rounded-xl overflow-clip">
+        <div
+          onClick={playing ? pause : play}
+          className="border rounded-xl w-fit h-fit !aspect-video mx-auto bg-slate-100 border-slate-300 overflow-clip"
+        >
+          <div className="w-full h-full not-prose rounded-xl overflow-clip">
             <ReactPlayer
               playing={playing}
               ref={playerRef}
@@ -184,8 +226,7 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
               onProgress={(state) => setSeek(state.playedSeconds)}
               url={url}
               controls={false}
-              playsinline={true}
-              webkit-playsinline={true}
+              playsinline
               onReady={getData}
               onDuration={setDuration}
             />
@@ -210,7 +251,7 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
             <div className={"p-3 md:block hidden grow"}>
               <Range
                 min={0.0}
-                max={_.ceil(duration)}
+                max={ceil(duration)}
                 onChange={(values) => {
                   setSeek(values[0]);
                   playerRef.current?.seekTo(values[0]);
@@ -231,8 +272,8 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
                       background: getTrackBackground({
                         values: [seek],
                         colors: ["rgb(241 245 249)", "rgb(203, 213, 225)"],
-                        min: 0,
-                        max: _.ceil(duration),
+                        min: 0.0,
+                        max: ceil(duration),
                       }),
                     }}
                   >
@@ -245,7 +286,7 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
             {/* seek/duration */}
             <p className={"text-slate-700 mx-4"}>{`${formateSecondsToMinutes(
               seek
-            )} / ${formateSecondsToMinutes(duration)}`}</p>
+            )} / ${formateSecondsToMinutes(ceil(duration))}`}</p>
 
             <div className="fill-slate-600" onClick={pip}>
               {isPip ? (
@@ -260,7 +301,8 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
           <div className={"p-3 md:hidden"}>
             <Range
               min={0.0}
-              max={_.ceil(duration)}
+              max={ceil(duration)}
+              step={1}
               onChange={(values) => {
                 setSeek(values[0]);
                 playerRef.current?.seekTo(values[0]);
@@ -281,8 +323,8 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
                     background: getTrackBackground({
                       values: [seek],
                       colors: ["rgb(241 245 249)", "rgb(203, 213, 225)"],
-                      min: 0,
-                      max: _.ceil(duration),
+                      min: 0.0,
+                      max: ceil(duration),
                     }),
                   }}
                 >
