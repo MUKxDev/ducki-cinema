@@ -44,15 +44,25 @@ export default function Dashboard() {
                 </span>
               </span>
             </a>
-            <a
-              data-rounded="rounded-full"
-              href="#_"
-              className="inline-flex items-center justify-center px-4 py-2 mr-1 text-base font-medium leading-6 text-indigo-600 whitespace-no-wrap transition duration-150 ease-in-out bg-white border border-transparent rounded-full hover:bg-white focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700"
-              data-primary="indigo-600"
-              onClick={() => auth.signOut()}
-            >
-              Sign Out
-            </a>
+            <div className={"gap-2 flex"}>
+              <div
+                data-rounded="rounded-full"
+                className="inline-flex items-center justify-center px-4 py-2 mr-1 text-base font-medium leading-6 text-indigo-600 whitespace-no-wrap transition duration-150 ease-in-out bg-white border border-transparent rounded-full cursor-pointer hover:bg-white focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700"
+                data-primary="indigo-600"
+                onClick={() => navigate(`/${"account"}`)}
+              >
+                Account
+              </div>
+              <a
+                data-rounded="rounded-full"
+                href="#_"
+                className="inline-flex items-center justify-center px-4 py-2 mr-1 text-base font-medium leading-6 text-indigo-600 whitespace-no-wrap transition duration-150 ease-in-out bg-white border border-transparent rounded-full hover:bg-white focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700"
+                data-primary="indigo-600"
+                onClick={() => auth.signOut()}
+              >
+                Sign Out
+              </a>
+            </div>
           </div>
         </nav>
         <div className="container py-32 mx-auto text-center sm:px-4">
@@ -112,9 +122,7 @@ export default function Dashboard() {
             />
             <button
               type="submit"
-              className={`rounded-l-none btn btn-accent ${
-                loading && "loading"
-              }`}
+              className={`rounded-l-none btn btn-accent`}
               data-primary="indigo-600"
             >
               Enter

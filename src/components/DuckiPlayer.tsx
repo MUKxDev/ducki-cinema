@@ -199,7 +199,7 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
         ></FallingEmojis> */}
       {/* </div> */}
       <div className="flex flex-col items-start justify-start">
-        <a href="/" className="w-1/4 pb-4 pl-6 pr-4 no-underline md:pl-4">
+        <a href="/" className="z-30 pb-4 pl-6 pr-4 no-underline w-fit md:pl-4">
           <span className="p-1 text-xl font-black leading-none select-none text-slate-600">
             <span className="">Ducki</span>
             <span className="text-indigo-300" data-primary="indigo-300">
