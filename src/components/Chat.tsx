@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ReactComponent as ArrowOpen } from "../assets/icons/arrow=open.svg";
 import { ReactComponent as ArrowClose } from "../assets/icons/arrow=close.svg";
 import { supabase, useAppContext } from "../context/appContext";
@@ -30,6 +30,12 @@ export default function Chat({ roomID }: Props) {
   const { currentSession, users, setUsers } = useAppContext();
 
   const { width } = useWindowDimensions();
+
+  const chatContainerEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    chatContainerEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [chats]);
 
   useEffect(() => {
     if (width < 1024 && collapse) {
@@ -338,6 +344,7 @@ export default function Chat({ roomID }: Props) {
                   <p className={"m-0"}>{chat.message}</p>
                 </div>
               ))}
+              <div ref={chatContainerEndRef}></div>
             </div>
             {/* Text field */}
             <form
