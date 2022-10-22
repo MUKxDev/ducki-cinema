@@ -4,136 +4,138 @@ export type Json =
   | boolean
   | null
   | { [key: string]: Json }
-  | Json[]
+  | Json[];
 
 export interface Database {
   public: {
     Tables: {
       chats: {
         Row: {
-          profileID: string | null
-          message: string | null
-          roomID: string | null
-          created_at: string | null
-          id: number
-        }
+          id: number;
+          created_at: string | null;
+          profileID: string | null;
+          message: string | null;
+          roomID: string | null;
+        };
         Insert: {
-          profileID?: string | null
-          message?: string | null
-          roomID?: string | null
-          created_at?: string | null
-          id?: number
-        }
+          id?: number;
+          created_at?: string | null;
+          profileID?: string | null;
+          message?: string | null;
+          roomID?: string | null;
+        };
         Update: {
-          profileID?: string | null
-          message?: string | null
-          roomID?: string | null
-          created_at?: string | null
-          id?: number
-        }
-      }
+          id?: number;
+          created_at?: string | null;
+          profileID?: string | null;
+          message?: string | null;
+          roomID?: string | null;
+        };
+      };
       mangaActivities: {
         Row: {
-          id: string
-          filePath: string | null
-          created_at: string | null
-          pageNumber: number | null
-        }
+          id: string;
+          created_at: string | null;
+          filePath: string | null;
+          pageNumber: number | null;
+        };
         Insert: {
-          id: string
-          filePath?: string | null
-          created_at?: string | null
-          pageNumber?: number | null
-        }
+          id: string;
+          created_at?: string | null;
+          filePath?: string | null;
+          pageNumber?: number | null;
+        };
         Update: {
-          id?: string
-          filePath?: string | null
-          created_at?: string | null
-          pageNumber?: number | null
-        }
-      }
+          id?: string;
+          created_at?: string | null;
+          filePath?: string | null;
+          pageNumber?: number | null;
+        };
+      };
       profiles: {
         Row: {
-          id: string
-          updated_at: string | null
-          username: string | null
-          avatar_url: string | null
-          displayname: string | null
-        }
+          id: string;
+          updated_at: string | null;
+          username: string | null;
+          avatar_url: string | null;
+          displayname: string | null;
+        };
         Insert: {
-          id: string
-          updated_at?: string | null
-          username?: string | null
-          avatar_url?: string | null
-          displayname?: string | null
-        }
+          id: string;
+          updated_at?: string | null;
+          username?: string | null;
+          avatar_url?: string | null;
+          displayname?: string | null;
+        };
         Update: {
-          id?: string
-          updated_at?: string | null
-          username?: string | null
-          avatar_url?: string | null
-          displayname?: string | null
-        }
-      }
+          id?: string;
+          updated_at?: string | null;
+          username?: string | null;
+          avatar_url?: string | null;
+          displayname?: string | null;
+        };
+      };
       rooms: {
         Row: {
-          videoActivityID: string | null
-          mangaActivityID: string | null
-          type: Database["public"]["Enums"]["activitytype"] | null
-          created_at: string | null
-          id: string
-        }
+          created_at: string | null;
+          id: string;
+          videoActivityID: string | null;
+          mangaActivityID: string | null;
+          type: Database["public"]["Enums"]["activitytype"] | null;
+          emoji: string | null;
+        };
         Insert: {
-          videoActivityID?: string | null
-          mangaActivityID?: string | null
-          type?: Database["public"]["Enums"]["activitytype"] | null
-          created_at?: string | null
-          id?: string
-        }
+          created_at?: string | null;
+          id?: string;
+          videoActivityID?: string | null;
+          mangaActivityID?: string | null;
+          type?: Database["public"]["Enums"]["activitytype"] | null;
+          emoji?: string | null;
+        };
         Update: {
-          videoActivityID?: string | null
-          mangaActivityID?: string | null
-          type?: Database["public"]["Enums"]["activitytype"] | null
-          created_at?: string | null
-          id?: string
-        }
-      }
+          created_at?: string | null;
+          id?: string;
+          videoActivityID?: string | null;
+          mangaActivityID?: string | null;
+          type?: Database["public"]["Enums"]["activitytype"] | null;
+          emoji?: string | null;
+        };
+      };
       videoActivities: {
         Row: {
-          url: string
-          lastUpdatedBy: string | null
-          id: string
-          created_at: string | null
-          isPlaying: boolean | null
-          seek: number | null
-        }
+          id: string;
+          created_at: string | null;
+          url: string;
+          isPlaying: boolean | null;
+          seek: number | null;
+          lastUpdatedBy: string | null;
+        };
         Insert: {
-          url: string
-          lastUpdatedBy?: string | null
-          id?: string
-          created_at?: string | null
-          isPlaying?: boolean | null
-          seek?: number | null
-        }
+          id?: string;
+          created_at?: string | null;
+          url: string;
+          isPlaying?: boolean | null;
+          seek?: number | null;
+          lastUpdatedBy?: string | null;
+        };
         Update: {
-          url?: string
-          lastUpdatedBy?: string | null
-          id?: string
-          created_at?: string | null
-          isPlaying?: boolean | null
-          seek?: number | null
-        }
-      }
-    }
+          id?: string;
+          created_at?: string | null;
+          url?: string;
+          isPlaying?: boolean | null;
+          seek?: number | null;
+          lastUpdatedBy?: string | null;
+        };
+      };
+    };
     Views: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     Functions: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     Enums: {
-      activitytype: "video" | "manga"
-    }
-  }
+      activitytype: "video" | "manga";
+    };
+  };
 }
-

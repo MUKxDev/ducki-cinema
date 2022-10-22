@@ -12,6 +12,7 @@ import { fetchProfiles } from "../database/supabase";
 import { find, ceil } from "lodash";
 
 import duckAvatar from "../assets/duckAvatar.png";
+// import FallingEmojis from "../components/DuckiEmojis";
 
 interface Props {
   videoActivity: VideoActivities;
@@ -29,10 +30,42 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
   const [lastUpdatedById, setLastUpdatedById] = useState<string>(
     currentSession?.user.id ?? ""
   );
+  // const [selectedEmoji, setSelectedEmoji] = useState<string>("");
+  // const [showEmojis, setShowEmojis] = useState<boolean>(false);
 
   const profilesQuery = useQuery<Profiles[]>(["profiles"], () =>
     fetchProfiles(users)
   );
+
+  // function setEmoji(label: string) {
+  //   switch (label) {
+  //     case "haha":
+  //       setSelectedEmoji("😂");
+  //       break;
+  //     case "love":
+  //       setSelectedEmoji("😍");
+  //       break;
+  //     case "fire":
+  //       setSelectedEmoji("🔥");
+  //       break;
+  //     case "wow":
+  //       setSelectedEmoji("😲");
+  //       break;
+  //     case "sad":
+  //       setSelectedEmoji("😭");
+  //       break;
+  //     case "angry":
+  //       setSelectedEmoji("😡");
+  //       break;
+
+  //     default:
+  //       break;
+  //   }
+  //   setShowEmojis(true);
+  //   _.delay(() => {
+  //     setShowEmojis(false);
+  //   }, 3000);
+  // }
 
   useEffect(() => {
     let subscription = supabase
@@ -154,6 +187,17 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
 
   return (
     <div className="px-4  py-4   mx-auto h-full space-y-4 prose flex flex-col !container prose-slate ">
+      {/* <div className={"absolute top-0 bottom-0 left-0 right-0 "}> */}
+      {/* Reactions */}
+      {/* <FallingEmojis
+          repeat={-1}
+          speed={3}
+          emojis={[selectedEmoji]}
+          disable={!showEmojis}
+          shake
+          density={10}
+        ></FallingEmojis> */}
+      {/* </div> */}
       <div className="flex flex-col items-start justify-start">
         <a href="/" className="w-1/4 pb-4 pl-6 pr-4 no-underline md:pl-4">
           <span className="p-1 text-xl font-black leading-none select-none text-slate-600">
@@ -165,7 +209,6 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
         </a>
         <div className="flex items-center justify-between w-full gap-3 mx-auto max-w-7xl">
           <div className="flex items-center gap-3 p-3 border rounded-md border-slate-300 input grow min-w-fit not-prose">
-            {/* <p className={"text-2xs"}>Last updated by:</p> */}
             <div className={"avatar "}>
               <div className={"w-8 h-8 rounded-full"}>
                 <img
@@ -184,26 +227,29 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
                 ?.displayname ?? "unknown"}
             </p>
           </div>
-
-          <form className="flex max-w-3xl mx-auto grow" onSubmit={handleSubmit}>
-            <input
-              value={updateUrl}
-              onChange={(e) => setUpdateUrl(e.target.value)}
-              type="text"
-              title="updateUrl"
-              className="input bg-slate-100 input-bordered grow"
-            />
-            <button className="ml-4 btn btn-accent" type="submit">
-              update
-            </button>
-          </form>
         </div>
+        <form
+          className="z-30 flex w-full max-w-3xl mx-auto my-2 grow"
+          onSubmit={handleSubmit}
+        >
+          <input
+            value={updateUrl}
+            onChange={(e) => setUpdateUrl(e.target.value)}
+            type="text"
+            title="updateUrl"
+            className="input bg-slate-100 input-bordered grow"
+          />
+          <button className="ml-4 btn btn-accent" type="submit">
+            update
+          </button>
+        </form>
       </div>
+
       {/* Player & controls */}
       <div className="flex flex-col py-4 space-y-4 overflow-hidden grow">
         <div
           onClick={playing ? pause : play}
-          className="border rounded-xl w-fit h-fit !aspect-video mx-auto bg-slate-100 border-slate-300 overflow-clip"
+          className="border cursor-pointer rounded-xl w-fit h-fit !aspect-video mx-auto bg-slate-100 border-slate-300 overflow-clip"
         >
           <div className="w-full h-full not-prose rounded-xl overflow-clip">
             <ReactPlayer
@@ -236,15 +282,15 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
         {/* Controls */}
         <div
           className={
-            "p-3 rounded-xl w-full max-w-7xl mx-auto bg-slate-200 flex flex-col space-y-3"
+            "p-3 z-30 rounded-xl w-full max-w-7xl mx-auto bg-slate-200 flex flex-col space-y-3"
           }
         >
           <div className="flex items-center justify-between not-prose ">
             <div className="" onClick={playing ? pause : play}>
               {playing ? (
-                <Pause className="stroke-slate-300" />
+                <Pause className="cursor-pointer stroke-slate-300" />
               ) : (
-                <Play className="stroke-slate-300" />
+                <Play className="cursor-pointer stroke-slate-300" />
               )}
             </div>
             {/* desktop slider */}
@@ -267,7 +313,7 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
                 renderTrack={({ props, children }) => (
                   <div
                     {...props}
-                    className={`w-full h-3 rounded-full border border-slate-300`}
+                    className={`w-full h-3 cursor-pointer rounded-full border border-slate-300`}
                     style={{
                       background: getTrackBackground({
                         values: [seek],
@@ -284,15 +330,17 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
             </div>
 
             {/* seek/duration */}
-            <p className={"text-slate-700 mx-4"}>{`${formateSecondsToMinutes(
-              seek
-            )} / ${formateSecondsToMinutes(ceil(duration))}`}</p>
+            <p
+              className={"text-slate-700 select-none mx-4"}
+            >{`${formateSecondsToMinutes(seek)} / ${formateSecondsToMinutes(
+              ceil(duration)
+            )}`}</p>
 
             <div className="fill-slate-600" onClick={pip}>
               {isPip ? (
-                <PipClose className="stroke-slate-300" />
+                <PipClose className="cursor-pointer stroke-slate-300" />
               ) : (
-                <PipOpen className="stroke-slate-300" />
+                <PipOpen className="cursor-pointer stroke-slate-300" />
               )}
             </div>
           </div>

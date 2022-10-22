@@ -6,11 +6,14 @@ import {
   fetchProfiles,
   fetchRoomChats,
   insertChat,
+  updateRoomEmoji,
 } from "../database/supabase";
 import { Chats, Profiles } from "../database/interfaces";
 import { isEmpty, find, uniqBy } from "lodash";
 import { useQuery } from "@tanstack/react-query";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { ReactionBarSelector } from "@charkour/react-reactions";
+import useWindowDimensions from "../helpers/useWindowDimensions";
 
 interface Props {
   roomID: string;
@@ -25,6 +28,14 @@ export default function Chat({ roomID }: Props) {
   const [newChat, setNewChat] = useState<Chats | null>(null);
 
   const { currentSession, users, setUsers } = useAppContext();
+
+  const { width } = useWindowDimensions();
+
+  useEffect(() => {
+    if (width < 1024 && collapse) {
+      setCollapse(false);
+    }
+  }, [width, collapse]);
 
   useEffect(() => {
     fetchRoomChats(roomID).then((data) => {
@@ -85,6 +96,33 @@ export default function Chat({ roomID }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newChat]);
 
+  async function setEmoji(label: string) {
+    let emoji: string = "";
+    switch (label) {
+      case "haha":
+        emoji = "😂";
+        break;
+      case "love":
+        emoji = "😍";
+        break;
+      case "fire":
+        emoji = "🔥";
+        break;
+      case "wow":
+        emoji = "😲";
+        break;
+      case "sad":
+        emoji = "😭";
+        break;
+      case "angry":
+        emoji = "😡";
+        break;
+    }
+
+    // TODO: update room emoji
+    await updateRoomEmoji(emoji, roomID);
+  }
+
   async function handleSubmit(e: any) {
     e.preventDefault();
     setLoading(true);
@@ -109,31 +147,163 @@ export default function Chat({ roomID }: Props) {
 
   return (
     <div
-      className={`w-full h-full max-h-60 lg:max-h-max lg:h-[95%] flex flex-col rounded-xl duration-200 lg:w-96  ${
+      className={`w-full h-full max-h-80 lg:max-h-max lg:h-[95%] flex flex-col rounded-xl duration-200 lg:w-96  ${
         collapse && "!w-20"
       }`}
     >
       <div
-        className={` lg:h-[95%] w-full h-full max-h-60 lg:max-h-max lg:fixed left-6 lg:left-auto right-6 flex flex-col p-4 bg-slate-200 rounded-xl duration-200 lg:w-96  ${
+        className={` lg:h-[95%] w-full h-full max-h-80 lg:max-h-max lg:fixed left-6 lg:left-auto right-6 flex flex-col p-4 bg-slate-200 rounded-xl duration-200 lg:w-96  ${
           collapse && "!w-20"
         }`}
       >
+        <div
+          className={`min-w-fit mx-auto block lg:hidden ${
+            collapse && "hidden"
+          }`}
+        >
+          <ReactionBarSelector
+            style={{ paddingRight: "14px" }}
+            reactions={[
+              {
+                label: "haha",
+                node: <div>😂</div>,
+                key: "haha",
+              },
+              {
+                label: "love",
+                node: <div>😍</div>,
+                key: "love",
+              },
+              {
+                label: "sad",
+                node: <div>😭</div>,
+                key: "sad",
+              },
+              {
+                label: "angry",
+                node: <div>😡</div>,
+                key: "angry",
+              },
+              {
+                label: "fire",
+                node: <div>🔥</div>,
+                key: "fire",
+              },
+              {
+                label: "wow",
+                node: <div>😲</div>,
+                key: "wow",
+              },
+            ]}
+            onSelect={setEmoji}
+          ></ReactionBarSelector>
+        </div>
         <div className="flex-col hidden lg:flex">
           <div
-            onClick={() => {
-              setCollapse(!collapse);
-              !collapse && setUnReadMessages([]);
-            }}
-            className=""
+            className={`flex justify-between items-center ${
+              collapse && "!justify-center"
+            }`}
           >
-            {collapse ? <ArrowClose className="mx-auto" /> : <ArrowOpen />}
+            <div
+              onClick={() => {
+                setCollapse(!collapse);
+                !collapse && setUnReadMessages([]);
+              }}
+              className=""
+            >
+              {collapse ? (
+                <ArrowClose className="mx-auto cursor-pointer" />
+              ) : (
+                <ArrowOpen className="mx-auto cursor-pointer" />
+              )}
+            </div>
+            <div className={`min-w-fit mx-auto ${collapse && "hidden"}`}>
+              <ReactionBarSelector
+                style={{ paddingRight: "14px" }}
+                reactions={[
+                  {
+                    label: "haha",
+                    node: <div>😂</div>,
+                    key: "haha",
+                  },
+                  {
+                    label: "love",
+                    node: <div>😍</div>,
+                    key: "love",
+                  },
+                  {
+                    label: "sad",
+                    node: <div>😭</div>,
+                    key: "sad",
+                  },
+                  {
+                    label: "angry",
+                    node: <div>😡</div>,
+                    key: "angry",
+                  },
+                  {
+                    label: "fire",
+                    node: <div>🔥</div>,
+                    key: "fire",
+                  },
+                  {
+                    label: "wow",
+                    node: <div>😲</div>,
+                    key: "wow",
+                  },
+                ]}
+                onSelect={setEmoji}
+              ></ReactionBarSelector>
+            </div>
           </div>
           {!isEmpty(unReadMessages) && collapse && (
             <h2 className="flex items-center justify-center p-1 mt-3 rounded-full aspect-square bg-accent">
               {unReadMessages.length}
             </h2>
           )}
+
+          {collapse && (
+            <div className="mt-4 rotate-90">
+              <ReactionBarSelector
+                style={{ paddingRight: "14px" }}
+                reactions={[
+                  {
+                    label: "haha",
+                    node: <div>😂</div>,
+                    key: "haha",
+                  },
+                  {
+                    label: "love",
+                    node: <div>😍</div>,
+                    key: "love",
+                  },
+                  {
+                    label: "sad",
+                    node: <div>😭</div>,
+                    key: "sad",
+                  },
+                  {
+                    label: "angry",
+                    node: <div>😡</div>,
+                    key: "angry",
+                  },
+                  {
+                    label: "fire",
+                    node: <div>🔥</div>,
+                    key: "fire",
+                  },
+                  {
+                    label: "wow",
+                    node: <div>😲</div>,
+                    key: "wow",
+                  },
+                ]}
+                onSelect={setEmoji}
+              ></ReactionBarSelector>
+            </div>
+          )}
         </div>
+
         {
           <div
             className={`w-full grow max-w-full overflow-hidden prose mt-4 flex flex-col ${

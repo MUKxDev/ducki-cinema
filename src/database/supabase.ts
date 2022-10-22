@@ -12,6 +12,7 @@ export async function getRoomData(id: string) {
       `
         id,
         type,
+        emoji,
         videoActivities!inner(*)
       `
     )
@@ -134,4 +135,20 @@ export async function fetchProfiles(users: string[]): Promise<Profiles[]> {
   }
 
   return temp;
+}
+export async function updateRoomEmoji(
+  emoji: string,
+  roomId: string
+): Promise<void> {
+  const { data, error } = await supabase
+    .from("rooms")
+    .update({ emoji: emoji })
+    .eq("id", roomId)
+    .select("*")
+    .single();
+
+  if (error) console.log(error);
+  if (error) throw error;
+
+  console.log(data);
 }
