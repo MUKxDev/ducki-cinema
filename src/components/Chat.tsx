@@ -26,6 +26,7 @@ export default function Chat({ roomID }: Props) {
   const [chats, setChats] = useState<Chats[]>([]);
   const [unReadMessages, setUnReadMessages] = useState<Chats[]>([]);
   const [newChat, setNewChat] = useState<Chats | null>(null);
+  const [newReaction, setNewReaction] = useState<string | null>(null);
 
   const { currentSession, users, setUsers } = useAppContext();
 
@@ -151,19 +152,38 @@ export default function Chat({ roomID }: Props) {
     setLoading(false);
   }
 
+  async function handleReactionSubmit(e: any) {
+    e.preventDefault();
+    // setLoading(true);
+    if (newReaction) {
+      try {
+        await updateRoomEmoji(newReaction, roomID);
+      } catch (error) {
+        console.log("Error sending a new reaction", error);
+      } finally {
+        setNewReaction(null);
+        let textField: any = document.getElementById("reaction1-text-field");
+        textField.value = null;
+        textField = document.getElementById("reaction2-text-field");
+        textField.value = null;
+      }
+    }
+    // setLoading(false);
+  }
+
   return (
     <div
-      className={`w-full h-full max-h-80 lg:max-h-max lg:h-[95%] flex flex-col rounded-xl duration-200 lg:w-96  ${
+      className={`w-full h-full z-30 max-h-96 lg:max-h-max lg:h-[95%] flex flex-col rounded-xl duration-200 lg:w-96  ${
         collapse && "!w-20"
       }`}
     >
       <div
-        className={` lg:h-[95%] w-full h-full max-h-80 lg:max-h-max lg:fixed left-6 lg:left-auto right-6 flex flex-col p-4 bg-slate-200 rounded-xl duration-200 lg:w-96  ${
+        className={` lg:h-[95%] w-full h-full max-h-96 lg:max-h-max lg:fixed left-6 lg:left-auto right-6 flex flex-col p-4 bg-slate-200 rounded-xl duration-200 lg:w-96  ${
           collapse && "!w-20"
         }`}
       >
         <div
-          className={`min-w-fit mx-auto block lg:hidden ${
+          className={`min-w-fit mx-auto flex flex-col md:flex-row items-center gap-3  justify-center lg:hidden ${
             collapse && "hidden"
           }`}
         >
@@ -203,6 +223,31 @@ export default function Chat({ roomID }: Props) {
             ]}
             onSelect={setEmoji}
           ></ReactionBarSelector>
+          <form
+            onSubmit={handleReactionSubmit}
+            className={`flex w-full z-30 space-x-3 min-h-fit ${
+              collapse && "hidden"
+            }`}
+          >
+            <input
+              id="reaction1-text-field"
+              type="text"
+              placeholder="Reaction..."
+              title="Reaction"
+              maxLength={10}
+              onChange={(e) => setNewReaction(e.target.value)}
+              onSubmit={() => !loading && handleReactionSubmit}
+              className="input grow"
+            />
+            <button
+              type="submit"
+              value="Send"
+              placeholder="Send"
+              className={`btn btn-secondary ${loading && "loading"}`}
+            >
+              {!loading && "send"}
+            </button>
+          </form>
         </div>
         <div className="flex-col hidden lg:flex">
           <div
@@ -308,6 +353,31 @@ export default function Chat({ roomID }: Props) {
               ></ReactionBarSelector>
             </div>
           )}
+          <form
+            onSubmit={handleReactionSubmit}
+            className={`flex w-full mt-4 z-30 space-x-3 min-h-fit ${
+              collapse && "hidden"
+            }`}
+          >
+            <input
+              id="reaction2-text-field"
+              type="text"
+              placeholder="Reaction..."
+              title="Reaction"
+              maxLength={10}
+              onChange={(e) => setNewReaction(e.target.value)}
+              onSubmit={() => !loading && handleReactionSubmit}
+              className="input grow"
+            />
+            <button
+              type="submit"
+              value="Send"
+              placeholder="Send"
+              className={`btn btn-secondary ${loading && "loading"}`}
+            >
+              {!loading && "send"}
+            </button>
+          </form>
         </div>
 
         {
@@ -325,7 +395,7 @@ export default function Chat({ roomID }: Props) {
               {chats.map((chat) => (
                 <div
                   key={chat.id}
-                  className={`max-w-[80%]  flex-col px-2 py-1 self-start bg-slate-300 rounded-md flex  ${
+                  className={`max-w-[80%] z-30 flex-col px-2 py-1 self-start bg-slate-300 rounded-md flex  ${
                     chat.profileID === currentSession?.user.id &&
                     "!self-end !bg-blue-500 !text-white"
                   }`}
@@ -349,7 +419,7 @@ export default function Chat({ roomID }: Props) {
             {/* Text field */}
             <form
               onSubmit={handleSubmit}
-              className="flex w-full mt-4 space-x-3 min-h-fit"
+              className="z-30 flex w-full mt-4 space-x-3 min-h-fit"
             >
               <input
                 id="chat-text-field"
