@@ -227,22 +227,22 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
                 ?.displayname ?? "unknown"}
             </p>
           </div>
+          <form
+            className="z-30 flex w-full max-w-3xl mx-auto my-2 grow"
+            onSubmit={handleSubmit}
+          >
+            <input
+              value={updateUrl}
+              onChange={(e) => setUpdateUrl(e.target.value)}
+              type="text"
+              title="updateUrl"
+              className="input bg-slate-100 text-slate-400 input-bordered grow"
+            />
+            <button className="ml-4 btn btn-accent" type="submit">
+              update
+            </button>
+          </form>
         </div>
-        <form
-          className="z-30 flex w-full max-w-3xl mx-auto my-2 grow"
-          onSubmit={handleSubmit}
-        >
-          <input
-            value={updateUrl}
-            onChange={(e) => setUpdateUrl(e.target.value)}
-            type="text"
-            title="updateUrl"
-            className="input bg-slate-100 input-bordered grow"
-          />
-          <button className="ml-4 btn btn-accent" type="submit">
-            update
-          </button>
-        </form>
       </div>
 
       {/* Player & controls */}
