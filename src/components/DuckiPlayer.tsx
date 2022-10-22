@@ -187,45 +187,38 @@ export default function DuckiPlayer({ videoActivity: videoActivitiy }: Props) {
 
   return (
     <div className="px-4  py-4   mx-auto h-full space-y-4 prose flex flex-col !container prose-slate ">
-      {/* <div className={"absolute top-0 bottom-0 left-0 right-0 "}> */}
-      {/* Reactions */}
-      {/* <FallingEmojis
-          repeat={-1}
-          speed={3}
-          emojis={[selectedEmoji]}
-          disable={!showEmojis}
-          shake
-          density={10}
-        ></FallingEmojis> */}
-      {/* </div> */}
-      <div className="flex flex-col items-start justify-start">
-        <a href="/" className="z-30 pb-4 pl-6 pr-4 no-underline w-fit md:pl-4">
-          <span className="p-1 text-xl font-black leading-none select-none text-slate-600">
-            <span className="">Ducki</span>
-            <span className="text-indigo-300" data-primary="indigo-300">
-              .
-            </span>
-          </span>
-        </a>
-        <div className="flex items-center justify-between w-full gap-3 mx-auto max-w-7xl">
-          <div className="flex items-center gap-3 p-3 border rounded-md border-slate-300 input grow min-w-fit not-prose">
-            <div className={"avatar "}>
-              <div className={"w-8 h-8 rounded-full"}>
-                <img
-                  src={
-                    find(
-                      profilesQuery.data,
-                      (value) => value.id === lastUpdatedById
-                    )?.avatar_url ?? duckAvatar
-                  }
-                  alt=""
-                />
+      <div className="flex flex-row items-center justify-start">
+        <div className="flex flex-col items-center justify-between w-full gap-3 mx-auto md:flex-row max-w-7xl">
+          <div className="flex flex-row items-center justify-between w-full">
+            <a href="/" className="z-30 pl-6 pr-4 no-underline w-fit md:pl-4">
+              <span className="p-1 text-xl font-black leading-none select-none text-slate-600">
+                <span className="">Ducki</span>
+                <span className="text-amber-400" data-primary="indigo-300">
+                  .
+                </span>
+              </span>
+            </a>
+            <div className="flex items-center w-full gap-3 p-3 border rounded-md grow border-slate-300 input min-w-fit not-prose">
+              <div className={"avatar "}>
+                <div className={"w-8 h-8 rounded-full"}>
+                  <img
+                    src={
+                      find(
+                        profilesQuery.data,
+                        (value) => value.id === lastUpdatedById
+                      )?.avatar_url ?? duckAvatar
+                    }
+                    alt=""
+                  />
+                </div>
               </div>
+              <p className={"text-xs text-blue-500 font-semibold"}>
+                {find(
+                  profilesQuery.data,
+                  (value) => value.id === lastUpdatedById
+                )?.displayname ?? "unknown"}
+              </p>
             </div>
-            <p className={"text-xs text-blue-500 font-semibold"}>
-              {find(profilesQuery.data, (value) => value.id === lastUpdatedById)
-                ?.displayname ?? "unknown"}
-            </p>
           </div>
           <form
             className="z-30 flex w-full max-w-3xl mx-auto my-2 grow"

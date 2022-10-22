@@ -36,7 +36,7 @@ export default function Chat({ roomID }: Props) {
 
   useEffect(() => {
     chatContainerEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chats]);
+  }, [chats, collapse]);
 
   useEffect(() => {
     if (width < 1024 && collapse) {
@@ -308,8 +308,13 @@ export default function Chat({ roomID }: Props) {
             </div>
           </div>
           {!isEmpty(unReadMessages) && collapse && (
-            <h2 className="flex items-center justify-center p-1 mt-3 rounded-full aspect-square bg-accent">
+            <h2 className="relative z-20 flex items-center justify-center p-1 mt-3 rounded-full isolate aspect-square bg-accent">
               {unReadMessages.length}
+              <div
+                className={
+                  "absolute top-0 -z-10 rounded-full animate-ping right-0 left-0 bottom-0 bg-amber-300"
+                }
+              ></div>
             </h2>
           )}
 
@@ -389,7 +394,7 @@ export default function Chat({ roomID }: Props) {
             <h1 className={"hidden lg:block"}>Chat</h1>
             <div
               className={
-                "w-full grow overflow-y-scroll bg-slate-100 min-h-[100px] rounded-lg p-3 space-y-2 flex flex-col"
+                "w-full grow overflow-y-scroll z-30 bg-slate-100 min-h-[100px] rounded-lg p-3 space-y-2 flex flex-col"
               }
             >
               {chats.map((chat) => (

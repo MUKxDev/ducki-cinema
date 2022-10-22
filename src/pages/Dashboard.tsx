@@ -76,9 +76,9 @@ export default function Dashboard() {
             className="max-w-lg mx-auto mt-6 text-sm text-center text-indigo-200 md:mt-12 sm:text-base md:max-w-xl md:text-lg xl:text-xl"
             data-primary="indigo-200"
           >
-            this simple website built by Ducki helps you do activities with your
-            loved ones like watching your favorite movies and TV
-            shows.&nbsp;(manga coming soon)
+            this simple website was built by Ducki to help you do activities
+            with your loved ones like watching your favorite movies and TV shows
+            together. (manga coming soon)
           </div>
           <form
             onSubmit={handleSubmit}
